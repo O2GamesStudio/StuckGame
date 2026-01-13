@@ -61,6 +61,18 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
         Debug.Log("Game Over!");
 
+        if (targetCharacter != null)
+        {
+            targetCharacter.ExplodeKnives();
+        }
+
+        StartCoroutine(FocusAfterExplosion());
+    }
+
+    IEnumerator FocusAfterExplosion()
+    {
+        yield return new WaitForSeconds(0.1f);
+
         FocusOnCharacter();
     }
 
@@ -68,15 +80,12 @@ public class GameManager : MonoBehaviour
     {
         if (targetCharacter != null && circleMask != null)
         {
-            // 월드 좌표 → 스크린 좌표 변환
             Vector3 worldPos = targetCharacter.transform.position;
             Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
-            // 활성화 + 포커스 애니메이션 (한 번에)
             circleMask.ShowAndFocus(screenPos, () =>
             {
                 Debug.Log("포커스 애니메이션 완료!");
-                // 여기서 게임오버 UI 표시
             });
         }
     }
