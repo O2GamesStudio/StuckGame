@@ -6,6 +6,7 @@ public class TargetCtrl : MonoBehaviour
     [SerializeField] bool rotateClockwise = true;
 
     private Rigidbody2D rb;
+    private bool isRotating = true;
 
     void Awake()
     {
@@ -20,10 +21,19 @@ public class TargetCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (rb != null)
+        if (rb != null && isRotating)
         {
             float direction = rotateClockwise ? -1f : 1f;
             rb.angularVelocity = direction * rotationSpeed;
+        }
+    }
+
+    public void StopRotation()
+    {
+        isRotating = false;
+        if (rb != null)
+        {
+            rb.angularVelocity = 0f;
         }
     }
 }
