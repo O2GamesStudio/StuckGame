@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,11 +10,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform spawnPoint;
     [SerializeField] float throwForce = 10f;
     [SerializeField] float spawnDelay = 0.5f;
-    [SerializeField] TargetCtrl targetCharacter; // 캐릭터 참조
-    [SerializeField] CircleMaskController circleMask; // 마스크 참조
+    [SerializeField] TargetCtrl targetCharacter;
+    [SerializeField] CircleMaskController circleMask;
+    [SerializeField] int targetStuckVal = 10; // 목표 개수
 
     private StuckObj currentKnife;
     private bool isGameOver = false;
+    private List<StuckObj> allKnives = new List<StuckObj>();
+    private int stuckAmount = 0;
 
     void Awake()
     {
@@ -30,6 +34,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         SpawnNewKnife();
+        UpdateUI();
     }
 
     void SpawnNewKnife()
@@ -37,6 +42,7 @@ public class GameManager : MonoBehaviour
         if (isGameOver) return;
 
         currentKnife = Instantiate(stuckObjPrefab, spawnPoint.position, Quaternion.identity);
+        allKnives.Add(currentKnife);
     }
 
     public void OnClick()
@@ -56,10 +62,33 @@ public class GameManager : MonoBehaviour
         SpawnNewKnife();
     }
 
+    public void OnKnifeStuck()
+    {
+        stuckAmount++;
+        UpdateUI();
+
+        if (stuckAmount >= targetStuckVal)
+        {
+            ClearStage();
+        }
+    }
+    public void ClearStage()
+    {
+        Debug.Log("Stage Clear!");
+        targetCharacter.ClearStage();
+    }
+    void UpdateUI()
+    {
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.TargetUIUpdate(targetStuckVal, stuckAmount);
+        }
+    }
+
     public void GameOver()
     {
         isGameOver = true;
-        Debug.Log("Game Over!");
+        DisableKnifeCollisions();
 
         if (targetCharacter != null)
         {
@@ -69,10 +98,31 @@ public class GameManager : MonoBehaviour
         StartCoroutine(FocusAfterExplosion());
     }
 
+    void DisableKnifeCollisions()
+    {
+        allKnives.RemoveAll(knife => knife == null);
+
+        for (int i = 0; i < allKnives.Count; i++)
+        {
+            for (int j = i + 1; j < allKnives.Count; j++)
+            {
+                if (allKnives[i] != null && allKnives[j] != null)
+                {
+                    Collider2D col1 = allKnives[i].GetCollider();
+                    Collider2D col2 = allKnives[j].GetCollider();
+
+                    if (col1 != null && col2 != null)
+                    {
+                        Physics2D.IgnoreCollision(col1, col2, true);
+                    }
+                }
+            }
+        }
+    }
+
     IEnumerator FocusAfterExplosion()
     {
-        yield return new WaitForSeconds(0.1f);
-
+        yield return new WaitForSeconds(0.2f);
         FocusOnCharacter();
     }
 

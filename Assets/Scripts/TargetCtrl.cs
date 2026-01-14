@@ -3,11 +3,13 @@ using DG.Tweening;
 
 public class TargetCtrl : MonoBehaviour
 {
+    Animator animator;
+
     [SerializeField] float rotationSpeed = 50f;
     [SerializeField] bool rotateClockwise = true;
-    [SerializeField] float explosionForce = 15f; // 칼 날리는 힘
-    [SerializeField] float scaleMultiplier = 1.5f; // 커지는 배율
-    [SerializeField] float scaleDuration = 0.3f; // 애니메이션 시간
+    [SerializeField] float explosionForce = 15f;
+    [SerializeField] float scaleMultiplier = 1.5f;
+    [SerializeField] float scaleDuration = 0.3f;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -16,6 +18,7 @@ public class TargetCtrl : MonoBehaviour
 
     void Awake()
     {
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         originalScale = transform.localScale;
@@ -35,7 +38,10 @@ public class TargetCtrl : MonoBehaviour
             rb.angularVelocity = direction * rotationSpeed;
         }
     }
-
+    public void ClearStage()
+    {
+        animator.SetTrigger("Win");
+    }
     public void StopRotation()
     {
         isRotating = false;
@@ -44,7 +50,6 @@ public class TargetCtrl : MonoBehaviour
             rb.angularVelocity = 0f;
         }
     }
-
     public void ExplodeKnives()
     {
         StopRotation();
