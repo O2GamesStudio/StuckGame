@@ -12,7 +12,6 @@ public class StuckObj : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
-        // 초기 물리 설정
         rb.gravityScale = 0;
         rb.bodyType = RigidbodyType2D.Dynamic;
     }
@@ -26,25 +25,20 @@ public class StuckObj : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D co)
     {
-        // 날라간 상태일 때
         if (isLaunched)
         {
-            // Border에만 충돌 처리
             if (co.transform.CompareTag("Border"))
             {
                 StickToBorder(co);
             }
-            // 다른 충돌은 모두 무시
             return;
         }
 
-        // 일반 게임 중 충돌 처리
         if (isStuck) return;
 
         if (co.transform.CompareTag("Target"))
         {
             Stick(co.transform);
-            // Target에 박혔을 때 카운트 증가
             GameManager.Instance.OnKnifeStuck();
         }
         else if (co.transform.CompareTag("StuckObj"))
@@ -74,17 +68,14 @@ public class StuckObj : MonoBehaviour
     {
         isStuck = true;
 
-        // 충돌 정보 가져오기
         ContactPoint2D contact = collision.GetContact(0);
         Vector2 hitPoint = contact.point;
         Vector2 hitNormal = contact.normal;
 
-        // 물리 완전 정지
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        // 충돌 지점에서 약간 박힌 위치로 조정
         Vector2 offset = -hitNormal * 0.3f;
         transform.position = hitPoint + offset;
     }
@@ -100,11 +91,9 @@ public class StuckObj : MonoBehaviour
         rb.linearVelocity = direction.normalized * force;
         rb.angularVelocity = Random.Range(-360f, 360f);
 
-        // 일정 시간 후 제거
         Destroy(gameObject, 5f);
     }
 
-    // 외부에서 Collider 접근용
     public Collider2D GetCollider()
     {
         return col;

@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] float spawnDelay = 0.5f;
     [SerializeField] TargetCtrl targetCharacter;
     [SerializeField] int targetStuckVal = 10;
+    [SerializeField] bool isInfiniteMode = false;
 
     private StuckObj currentKnife;
     private bool isGameOver = false;
@@ -75,7 +76,17 @@ public class GameManager : MonoBehaviour
     public void ClearStage()
     {
         Debug.Log("Stage Clear!");
+        isGameOver = true;
+
+        // 발사 대기 중인 칼 제거
+        if (currentKnife != null)
+        {
+            Destroy(currentKnife.gameObject);
+            currentKnife = null;
+        }
+
         targetCharacter.ClearStage();
+        FocusOnCharacterWin();
     }
 
     void UpdateUI()
@@ -124,21 +135,32 @@ public class GameManager : MonoBehaviour
     IEnumerator FocusAfterExplosion()
     {
         yield return null;
-        FocusOnCharacter();
+        FocusOnCharacterLose();
     }
 
-    void FocusOnCharacter()
+    void FocusOnCharacterWin()
     {
         if (targetCharacter != null && UIManager.Instance.circleMask != null)
         {
             Vector3 worldPos = targetCharacter.transform.position;
             Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
-            // CircleMask 애니메이션 완료 후 버튼 표시
             UIManager.Instance.circleMask.ShowAndFocus(screenPos, () =>
             {
-                Debug.Log("포커스 애니메이션 완료!");
-                UIManager.Instance.ShowButtons();
+                UIManager.Instance.ShowWinUI();
+            });
+        }
+    }
+    void FocusOnCharacterLose()
+    {
+        if (targetCharacter != null && UIManager.Instance.circleMask != null)
+        {
+            Vector3 worldPos = targetCharacter.transform.position;
+            Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+            UIManager.Instance.circleMask.ShowAndFocus(screenPos, () =>
+            {
+                UIManager.Instance.ShowLoseUI();
             });
         }
     }

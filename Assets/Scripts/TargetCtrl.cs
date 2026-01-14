@@ -40,6 +40,27 @@ public class TargetCtrl : MonoBehaviour
     }
     public void ClearStage()
     {
+        StopRotation();
+
+        // 박혀있는 칼들의 부모를 해제하여 회전 상속 방지
+        StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
+        foreach (StuckObj knife in stuckKnives)
+        {
+            if (knife != null)
+            {
+                knife.transform.SetParent(null);
+
+                // 칼의 물리도 정지시킴
+                Rigidbody2D knifeRb = knife.GetComponent<Rigidbody2D>();
+                if (knifeRb != null)
+                {
+                    knifeRb.bodyType = RigidbodyType2D.Kinematic;
+                    knifeRb.linearVelocity = Vector2.zero;
+                    knifeRb.angularVelocity = 0f;
+                }
+            }
+        }
+
         animator.SetTrigger("Win");
     }
     public void StopRotation()

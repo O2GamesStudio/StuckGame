@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [SerializeField] Button retryBtn, exitBtn;
+    [SerializeField] Button nextBtn, exitWinBtn;
     [SerializeField] Button screenBtn;
     [SerializeField] Image targetImage;
     [SerializeField] TextMeshProUGUI targetText;
@@ -25,10 +26,10 @@ public class UIManager : MonoBehaviour
 
     public CircleMaskController circleMask;
 
-    private Vector3 retryBtnHiddenPos;
-    private Vector3 exitBtnHiddenPos;
-    private Vector3 retryBtnTargetPos;
-    private Vector3 exitBtnTargetPos;
+    private Vector3 retryBtnHiddenPos, exitBtnHiddenPos;
+    private Vector3 retryBtnTargetPos, exitBtnTargetPos;
+    private Vector3 nextBtnHiddenPos, exitWinBtnHiddenPos;
+    private Vector3 nextBtnTargetPos, exitWinBtnTargetPos;
 
     void Awake()
     {
@@ -44,17 +45,32 @@ public class UIManager : MonoBehaviour
         screenBtn.onClick.AddListener(ScreenOnClick);
         exitBtn.onClick.AddListener(ExitOnClick);
         retryBtn.onClick.AddListener(RetryOnClick);
+        exitWinBtn.onClick.AddListener(ExitOnClick);
+        nextBtn.onClick.AddListener(NextOnClick);
 
-        // 버튼의 숨겨진 위치 저장
         retryBtnHiddenPos = retryBtn.transform.localPosition;
         exitBtnHiddenPos = exitBtn.transform.localPosition;
+        nextBtnHiddenPos = nextBtn.transform.localPosition;
+        exitWinBtnHiddenPos = exitWinBtn.transform.localPosition;
 
-        // 버튼의 목표 위치 계산 (현재 위치에서 위로 300)
         retryBtnTargetPos = retryBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
         exitBtnTargetPos = exitBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
+        nextBtnTargetPos = nextBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
+        exitWinBtnTargetPos = exitWinBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
     }
 
-    public void ShowButtons()
+    public void ShowWinUI()
+    {
+        Sequence nextSeq = DOTween.Sequence();
+        Sequence exitSeq = DOTween.Sequence();
+
+        nextSeq.Append(nextBtn.transform.DOLocalMove(nextBtnTargetPos, buttonMoveDuration).SetEase(buttonMoveEase))
+                .AppendCallback(() => StartButtonBounce(nextBtn, nextBtnTargetPos));
+
+        exitSeq.Append(exitWinBtn.transform.DOLocalMove(exitWinBtnTargetPos, buttonMoveDuration).SetEase(buttonMoveEase))
+               .AppendCallback(() => StartButtonBounce(exitWinBtn, exitWinBtnTargetPos));
+    }
+    public void ShowLoseUI()
     {
         Sequence retrySeq = DOTween.Sequence();
         Sequence exitSeq = DOTween.Sequence();
@@ -86,7 +102,11 @@ public class UIManager : MonoBehaviour
 
         targetText.text = nowVal + "/" + targetVal;
     }
+    void NextOnClick()
+    {
+        //Todo : 다음 챕터 시작
 
+    }
     void ExitOnClick()
     {
         DOTween.KillAll();

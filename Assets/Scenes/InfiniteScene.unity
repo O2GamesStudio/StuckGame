@@ -337,8 +337,8 @@ MonoBehaviour:
   throwForce: 70
   spawnDelay: 0.3
   targetCharacter: {fileID: 876745119}
+  circleMask: {fileID: 0}
   targetStuckVal: 10
-  isInfiniteMode: 1
 --- !u!1 &458614425
 GameObject:
   m_ObjectHideFlags: 0
