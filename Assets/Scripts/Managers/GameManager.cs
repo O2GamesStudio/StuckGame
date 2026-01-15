@@ -1,23 +1,32 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("Game Objects")]
     [SerializeField] StuckObj stuckObjPrefab;
     [SerializeField] Transform spawnPoint;
+    [SerializeField] TargetCtrl targetCharacter;
+
+    [Header("Game Settings")]
     [SerializeField] float throwForce = 10f;
     [SerializeField] float spawnDelay = 0.5f;
-    [SerializeField] TargetCtrl targetCharacter;
-    [SerializeField] int targetStuckVal = 10;
-    [SerializeField] bool isInfiniteMode = false;
+    [SerializeField] float stageTransitionDelay = 1f; // 스테이지 전환 딜레이
+
+    [Header("Chapter & Stage")]
+    [SerializeField] ChapterData currentChapter;
+    [SerializeField] int currentStageIndex = 0; // 0~9 (스테이지 1~10)
 
     private StuckObj currentKnife;
     private bool isGameOver = false;
+    private bool isGameActive = false;
     private List<StuckObj> allKnives = new List<StuckObj>();
     private int stuckAmount = 0;
+    private int targetStuckVal = 10;
 
     void Awake()
     {
@@ -33,13 +42,54 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        isGameActive = true; // 먼저 활성화
+        InitializeStage();
         SpawnNewKnife();
         UpdateUI();
+    }
+    void InitializeStage()
+    {
+        if (currentChapter == null)
+        {
+            Debug.LogError("Chapter Data is not assigned!");
+            return;
+        }
+
+        // 현재 스테이지 설정 가져오기
+        ChapterData.StageSettings stageSettings = currentChapter.GetStageSettings(currentStageIndex);
+
+        // 목표 칼 개수 설정
+        targetStuckVal = stageSettings.requiredKnives;
+
+        // 타겟 캐릭터 초기화
+        if (targetCharacter != null)
+        {
+            targetCharacter.InitializeStage(stageSettings);
+        }
+
+        // 게임 상태 초기화
+        stuckAmount = 0;
+        isGameOver = false;
+
+        // UI 스테이지 텍스트 업데이트 추가
+        UpdateStageText();
+    }
+
+    // GameManager.cs - 새로운 메서드 추가
+    void UpdateStageText()
+    {
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateStageText(currentStageIndex + 1);
+        }
     }
 
     void SpawnNewKnife()
     {
-        if (isGameOver) return;
+        if (isGameOver || !isGameActive)
+        {
+            return;
+        }
 
         currentKnife = Instantiate(stuckObjPrefab, spawnPoint.position, Quaternion.identity);
         allKnives.Add(currentKnife);
@@ -47,7 +97,7 @@ public class GameManager : MonoBehaviour
 
     public void OnClick()
     {
-        if (currentKnife != null && !isGameOver)
+        if (currentKnife != null && !isGameOver && isGameActive)
         {
             currentKnife.Throw(throwForce);
             currentKnife = null;
@@ -69,23 +119,93 @@ public class GameManager : MonoBehaviour
 
         if (stuckAmount >= targetStuckVal)
         {
-            ClearStage();
+            StageComplete();
         }
     }
 
-    public void ClearStage()
+    void StageComplete()
     {
-        Debug.Log("Stage Clear!");
-        isGameOver = true;
+        isGameActive = false;
 
-        // 발사 대기 중인 칼 제거
         if (currentKnife != null)
         {
             Destroy(currentKnife.gameObject);
             currentKnife = null;
         }
 
-        targetCharacter.ClearStage();
+        if (targetCharacter != null)
+        {
+            targetCharacter.StopRotation();
+        }
+
+        StartCoroutine(TransitionToNextStage());
+    }
+
+    IEnumerator TransitionToNextStage()
+    {
+        yield return new WaitForSeconds(stageTransitionDelay);
+
+        currentStageIndex++;
+
+        // 챕터의 모든 스테이지를 완료한 경우
+        if (currentStageIndex >= currentChapter.TotalStages)
+        {
+            ChapterComplete();
+            yield break;
+        }
+
+        // 다음 스테이지 로드
+        LoadNextStage();
+    }
+
+    void LoadNextStage()
+    {
+        // 모든 칼 제거
+        ClearAllKnives();
+
+        // 타겟에 박혀있는 칼들도 제거
+        StuckObj[] stuckKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
+        foreach (StuckObj knife in stuckKnives)
+        {
+            if (knife != null)
+            {
+                Destroy(knife.gameObject);
+            }
+        }
+
+        // 게임 활성화
+        isGameActive = true;
+
+        // 새 스테이지 초기화
+        InitializeStage();
+        SpawnNewKnife();
+        UpdateUI();
+    }
+
+    void ClearAllKnives()
+    {
+        // 리스트에 있는 모든 칼 제거
+        foreach (var knife in allKnives)
+        {
+            if (knife != null)
+            {
+                Destroy(knife.gameObject);
+            }
+        }
+        allKnives.Clear();
+    }
+
+    void ChapterComplete()
+    {
+        Debug.Log($"Chapter {currentChapter.ChapterNumber} Complete!");
+        isGameOver = true;
+
+        // 챕터 완료 처리
+        if (targetCharacter != null)
+        {
+            targetCharacter.ClearStage();
+        }
+
         FocusOnCharacterWin();
     }
 
@@ -100,6 +220,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         isGameOver = true;
+        isGameActive = false;
         DisableKnifeCollisions();
 
         if (targetCharacter != null)
@@ -151,6 +272,7 @@ public class GameManager : MonoBehaviour
             });
         }
     }
+
     void FocusOnCharacterLose()
     {
         if (targetCharacter != null && UIManager.Instance.circleMask != null)
@@ -163,5 +285,25 @@ public class GameManager : MonoBehaviour
                 UIManager.Instance.ShowLoseUI();
             });
         }
+    }
+
+    public void RestartStage()
+    {
+        // DOTween 애니메이션 정리
+        DOTween.KillAll();
+
+        ClearAllKnives();
+
+        isGameActive = true;
+
+        InitializeStage();
+        SpawnNewKnife();
+        UpdateUI();
+    }
+
+    public void RestartChapter()
+    {
+        currentStageIndex = 0;
+        RestartStage();
     }
 }

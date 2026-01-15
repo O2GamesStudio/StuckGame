@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button screenBtn;
     [SerializeField] Image targetImage;
     [SerializeField] TextMeshProUGUI targetText;
+    [SerializeField] TextMeshProUGUI stageText;
     [SerializeField] float fillDuration = 0.3f;
     [SerializeField] Ease fillEase = Ease.OutQuad;
 
@@ -58,7 +59,13 @@ public class UIManager : MonoBehaviour
         nextBtnTargetPos = nextBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
         exitWinBtnTargetPos = exitWinBtnHiddenPos + new Vector3(0, buttonMoveDistance, 0);
     }
-
+    public void UpdateStageText(int stageNumber)
+    {
+        if (stageText != null)
+        {
+            stageText.text = "Stage " + stageNumber;
+        }
+    }
     public void ShowWinUI()
     {
         Sequence nextSeq = DOTween.Sequence();

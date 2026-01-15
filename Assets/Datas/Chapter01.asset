@@ -1,0 +1,147 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0432eee6c92b24f4680e990322b4ac3e, type: 3}
+  m_Name: Chapter01
+  m_EditorClassIdentifier: Assembly-CSharp::ChapterData
+  chapterName: "\uB3D9\uBB3C\uC758 \uC655\uAD6D"
+  chapterNumber: 0
+  stages:
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 300
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 100
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+  - minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 100
+    maxMaxSpeed: 200
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 60
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
