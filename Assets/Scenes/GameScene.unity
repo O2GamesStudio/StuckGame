@@ -144,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 118860083}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -8, z: 0}
+  m_LocalPosition: {x: 0, y: -9.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -335,9 +335,9 @@ MonoBehaviour:
   stuckObjPrefab: {fileID: 446823913286080183, guid: 2b4aa3ecbaa696a4090a1bf48d8e517f, type: 3}
   spawnPoint: {fileID: 118860084}
   throwForce: 70
-  spawnDelay: 0.3
+  spawnDelay: 0.1
   targetCharacter: {fileID: 876745119}
-  targetStuckVal: 10
+  targetStuckVal: 100
   isInfiniteMode: 1
 --- !u!1 &458614425
 GameObject:
@@ -810,7 +810,7 @@ Transform:
   m_GameObject: {fileID: 876745115}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -868,11 +868,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fbb60a3211963d4fb39f1623348abdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetCtrl
-  rotationSpeed: 100
+  minStartSpeed: 30
+  maxStartSpeed: 60
+  minMaxSpeed: 100
+  maxMaxSpeed: 200
+  speedChangeRate: 15
   rotateClockwise: 1
+  enableReverseRotation: 1
+  minHoldTime: 1
+  maxHoldTime: 3
+  reverseDeceleration: 60
+  reverseWaitTime: 0.3
+  reverseDirection: 1
   explosionForce: 30
   scaleMultiplier: 1.3
   scaleDuration: 0.3
+  hitAlphaValue: 0.8
+  hitFadeDuration: 0.05
 --- !u!50 &876745120
 Rigidbody2D:
   serializedVersion: 5

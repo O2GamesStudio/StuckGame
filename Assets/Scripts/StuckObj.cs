@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class StuckObj : MonoBehaviour
@@ -23,6 +24,7 @@ public class StuckObj : MonoBehaviour
         rb.linearVelocity = Vector2.up * force;
     }
 
+
     void OnCollisionEnter2D(Collision2D co)
     {
         if (isLaunched)
@@ -39,6 +41,14 @@ public class StuckObj : MonoBehaviour
         if (co.transform.CompareTag("Target"))
         {
             Stick(co.transform);
+
+            // 타겟에 피드백 효과 트리거
+            TargetCtrl targetCtrl = co.transform.GetComponent<TargetCtrl>();
+            if (targetCtrl != null)
+            {
+                targetCtrl.OnKnifeHit();
+            }
+
             GameManager.Instance.OnKnifeStuck();
         }
         else if (co.transform.CompareTag("StuckObj"))
@@ -48,7 +58,7 @@ public class StuckObj : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator GameOverAfterDelay()
+    IEnumerator GameOverAfterDelay()
     {
         yield return new WaitForSeconds(0.2f);
         GameManager.Instance.GameOver();

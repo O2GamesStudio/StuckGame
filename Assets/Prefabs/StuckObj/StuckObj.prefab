@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 366a21fb3f5714f47aad02a86bc16d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StuckObj
+  trailRenderer: {fileID: 0}
 --- !u!50 &4806536573623460759
 Rigidbody2D:
   serializedVersion: 5
