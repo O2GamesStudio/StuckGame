@@ -26,6 +26,7 @@ public class TargetCtrl : MonoBehaviour
     private float maxMaxSpeed;
     private float minSpeedChangeRate;
     private float maxSpeedChangeRate;
+    private float accelerationRatio;
     private float currentSpeedChangeRate;
     private bool rotateClockwise;
 
@@ -38,6 +39,7 @@ public class TargetCtrl : MonoBehaviour
     private float currentSpeed;
     private float targetSpeed;
     private float currentDirection;
+
 
     private enum RotationState { Accelerating, Holding, Decelerating, Waiting }
     private RotationState rotationState = RotationState.Accelerating;
@@ -67,8 +69,7 @@ public class TargetCtrl : MonoBehaviour
         maxStartSpeed = settings.maxStartSpeed;
         minMaxSpeed = settings.minMaxSpeed;
         maxMaxSpeed = settings.maxMaxSpeed;
-        minSpeedChangeRate = settings.minSpeedChangeRate; // 수정
-        maxSpeedChangeRate = settings.maxSpeedChangeRate; // 수정
+        accelerationRatio = settings.accelerationRatio;
         rotateClockwise = settings.rotateClockwise;
 
         minHoldTime = settings.minHoldTime;
@@ -87,7 +88,9 @@ public class TargetCtrl : MonoBehaviour
     {
         currentSpeed = Random.Range(minStartSpeed, maxStartSpeed);
         targetSpeed = Random.Range(minMaxSpeed, maxMaxSpeed);
-        currentSpeedChangeRate = Random.Range(minSpeedChangeRate, maxSpeedChangeRate);
+
+        // 목표 속도에 비례한 가속도 계산
+        currentSpeedChangeRate = targetSpeed * accelerationRatio;
 
         bool randomDirection = Random.value > 0.5f;
         currentDirection = rotateClockwise ? -1f : 1f;
@@ -103,8 +106,6 @@ public class TargetCtrl : MonoBehaviour
         {
             rb.angularVelocity = currentDirection * currentSpeed;
         }
-
-        Debug.Log($"Rotation initialized - Speed: {currentSpeed} -> {targetSpeed}, Acceleration: {currentSpeedChangeRate}, Direction: {(currentDirection < 0 ? "Clockwise" : "CounterClockwise")}");
     }
 
     void FixedUpdate()
@@ -118,7 +119,7 @@ public class TargetCtrl : MonoBehaviour
         switch (rotationState)
         {
             case RotationState.Accelerating:
-                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, currentSpeedChangeRate * Time.fixedDeltaTime); // 수정
+                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, currentSpeedChangeRate * Time.fixedDeltaTime);
                 rb.angularVelocity = currentDirection * currentSpeed;
 
                 if (Mathf.Abs(currentSpeed - targetSpeed) < 0.5f)
@@ -165,11 +166,13 @@ public class TargetCtrl : MonoBehaviour
 
                     targetSpeed = Random.Range(minMaxSpeed, maxMaxSpeed);
                     currentSpeed = Random.Range(minStartSpeed, maxStartSpeed);
-                    currentSpeedChangeRate = Random.Range(minSpeedChangeRate, maxSpeedChangeRate); // 새로운 랜덤 가속도
+
+                    // 새로운 목표 속도에 비례한 가속도 계산
+                    currentSpeedChangeRate = targetSpeed * accelerationRatio;
 
                     rotationState = RotationState.Accelerating;
 
-                    Debug.Log($"Direction changed - New speed: {currentSpeed} -> {targetSpeed}, New acceleration: {currentSpeedChangeRate}");
+                    Debug.Log($"Direction changed - New speed: {currentSpeed} -> {targetSpeed}, New acceleration: {currentSpeedChangeRate} ({accelerationRatio * 100}% of target)");
                 }
                 break;
         }
@@ -256,8 +259,10 @@ public class TargetCtrl : MonoBehaviour
             col.enabled = false;
         }
 
+        // 부모 해제 전에 칼들 가져오기
         StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
 
+        // 칼들의 부모를 먼저 해제
         foreach (StuckObj knife in stuckKnives)
         {
             if (knife != null)
@@ -284,8 +289,8 @@ public class TargetCtrl : MonoBehaviour
         {
             if (knife != null)
             {
-                Vector2 localDown = -knife.transform.up;
-                knife.Launch(localDown, explosionForce);
+                Vector2 launchDirection = (knife.transform.position - transform.position).normalized;
+                knife.Launch(launchDirection, explosionForce);
             }
         }
     }

@@ -9,10 +9,12 @@ public class ChapterData : ScriptableObject
         [Header("Rotation Settings")]
         [HideInInspector] public float minStartSpeed = 0f;
         [HideInInspector] public float maxStartSpeed = 80f;
-        [HideInInspector] public float minSpeedChangeRate = 20f;
-        [HideInInspector] public float maxSpeedChangeRate = 60f;
+        [HideInInspector] public float minSpeedChangeRate = 40f;
+        [HideInInspector] public float maxSpeedChangeRate = 80f;
         public float minMaxSpeed = 100f;
-        public float maxMaxSpeed = 300f;
+        public float maxMaxSpeed = 200f;
+        [Range(0f, 1f)]
+        public float accelerationRatio = 0.3f;
         public bool rotateClockwise = true;
 
         [Header("Reverse Rotation Settings")]
@@ -24,6 +26,9 @@ public class ChapterData : ScriptableObject
 
         [Header("Stage Info")]
         public int requiredKnives = 10;
+        [Range(0, 20)]
+        public int obstacleCount = 0;
+
     }
 
     [SerializeField] private string chapterName;

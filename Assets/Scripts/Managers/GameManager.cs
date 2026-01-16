@@ -55,27 +55,94 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 현재 스테이지 설정 가져오기
         ChapterData.StageSettings stageSettings = currentChapter.GetStageSettings(currentStageIndex);
-
-        // 목표 칼 개수 설정
         targetStuckVal = stageSettings.requiredKnives;
 
-        // 타겟 캐릭터 초기화
         if (targetCharacter != null)
         {
             targetCharacter.InitializeStage(stageSettings);
         }
 
-        // 게임 상태 초기화
         stuckAmount = 0;
         isGameOver = false;
 
-        // UI 스테이지 텍스트 업데이트 추가
+        SpawnObstacles(stageSettings.obstacleCount);
         UpdateStageText();
+
     }
 
-    // GameManager.cs - 새로운 메서드 추가
+    void SpawnObstacles(int count)
+    {
+        if (count <= 0 || targetCharacter == null) return;
+
+        CircleCollider2D targetCollider = targetCharacter.GetComponent<CircleCollider2D>();
+        float targetRadius = 1f;
+
+        if (targetCollider != null)
+        {
+            targetRadius = targetCollider.radius * targetCharacter.transform.localScale.x;
+        }
+
+        SpriteRenderer knifeSprite = stuckObjPrefab.GetComponent<SpriteRenderer>();
+        float knifeLength = 0f;
+
+        if (knifeSprite != null)
+        {
+            knifeLength = knifeSprite.bounds.size.y * 0.5f;
+        }
+
+        float minAngleGap = 15f;
+
+        List<float> usedAngles = new List<float>();
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = 0f;
+            bool validAngle = false;
+            int maxAttempts = 100;
+            int attempts = 0;
+
+            while (!validAngle && attempts < maxAttempts)
+            {
+                angle = Random.Range(0f, 360f);
+                validAngle = true;
+                foreach (float usedAngle in usedAngles)
+                {
+                    float angleDiff = Mathf.Abs(Mathf.DeltaAngle(angle, usedAngle));
+                    if (angleDiff < minAngleGap)
+                    {
+                        validAngle = false;
+                        break;
+                    }
+                }
+
+                attempts++;
+            }
+
+            usedAngles.Add(angle);
+
+            Quaternion rotation = Quaternion.Euler(0, 0, angle);
+
+            Vector3 direction = rotation * Vector3.up;
+            Vector3 spawnPosition = targetCharacter.transform.position + direction * (targetRadius + knifeLength);
+
+            StuckObj obstacle = Instantiate(stuckObjPrefab, spawnPosition, rotation);
+
+            Vector3 worldPos = obstacle.transform.position;
+            Quaternion worldRot = obstacle.transform.rotation;
+
+            obstacle.transform.SetParent(targetCharacter.transform);
+
+            obstacle.transform.position = worldPos;
+            obstacle.transform.rotation = worldRot;
+            obstacle.StickAsObstacle(targetCharacter.transform);
+
+            allKnives.Add(obstacle);
+        }
+
+        Debug.Log($"Spawned {count} obstacles with radius: {targetRadius}, knife length: {knifeLength}");
+    }
+
     void UpdateStageText()
     {
         if (UIManager.Instance != null)
@@ -163,20 +230,10 @@ public class GameManager : MonoBehaviour
         // 모든 칼 제거
         ClearAllKnives();
 
-        // 타겟에 박혀있는 칼들도 제거
-        StuckObj[] stuckKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
-        foreach (StuckObj knife in stuckKnives)
-        {
-            if (knife != null)
-            {
-                Destroy(knife.gameObject);
-            }
-        }
-
         // 게임 활성화
         isGameActive = true;
 
-        // 새 스테이지 초기화
+        // 새 스테이지 초기화 (장애물 포함)
         InitializeStage();
         SpawnNewKnife();
         UpdateUI();
@@ -292,10 +349,13 @@ public class GameManager : MonoBehaviour
         // DOTween 애니메이션 정리
         DOTween.KillAll();
 
+        // allKnives 리스트의 모든 칼 제거
         ClearAllKnives();
 
+        // 게임 활성화
         isGameActive = true;
 
+        // 현재 스테이지 재초기화 (장애물 포함)
         InitializeStage();
         SpawnNewKnife();
         UpdateUI();

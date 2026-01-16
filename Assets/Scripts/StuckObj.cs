@@ -27,6 +27,7 @@ public class StuckObj : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D co)
     {
+        Debug.Log(co.transform.name);
         if (isLaunched)
         {
             if (co.transform.CompareTag("Border"))
@@ -42,7 +43,6 @@ public class StuckObj : MonoBehaviour
         {
             Stick(co.transform);
 
-            // 타겟에 피드백 효과 트리거
             TargetCtrl targetCtrl = co.transform.GetComponent<TargetCtrl>();
             if (targetCtrl != null)
             {
@@ -102,6 +102,15 @@ public class StuckObj : MonoBehaviour
         rb.angularVelocity = Random.Range(-360f, 360f);
 
         Destroy(gameObject, 5f);
+    }
+    public void StickAsObstacle(Transform target)
+    {
+        isStuck = true;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+
     }
 
     public Collider2D GetCollider()
