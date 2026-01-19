@@ -1,6 +1,7 @@
 // TargetPointManager.cs
 using UnityEngine;
 using System.Collections.Generic;
+using Lean.Pool;
 
 public class TargetPointManager : MonoBehaviour
 {
@@ -75,7 +76,8 @@ public class TargetPointManager : MonoBehaviour
 
             usedAngles.Add(angle);
 
-            GameObject pointObj = Instantiate(targetPointPrefab, targetCharacter.transform);
+            // LeanPool.Spawn 사용
+            GameObject pointObj = LeanPool.Spawn(targetPointPrefab, targetCharacter.transform);
             pointObj.name = $"TargetPoint_{i}";
 
             Quaternion rotation = Quaternion.Euler(0, 0, angle);
@@ -120,7 +122,7 @@ public class TargetPointManager : MonoBehaviour
         {
             if (point != null)
             {
-                Destroy(point.gameObject);
+                LeanPool.Despawn(point.gameObject);
             }
         }
 

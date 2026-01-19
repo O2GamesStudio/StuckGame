@@ -1,4 +1,5 @@
 using UnityEngine;
+using Lean.Pool;
 
 public class TargetPoint : MonoBehaviour
 {
@@ -14,6 +15,15 @@ public class TargetPoint : MonoBehaviour
             ((CircleCollider2D)pointCollider).radius = 0.3f;
         }
         pointCollider.isTrigger = true;
+    }
+
+    void OnSpawn()
+    {
+        isCompleted = false;
+        if (pointCollider != null)
+        {
+            pointCollider.enabled = true;
+        }
     }
 
     public bool IsCompleted => isCompleted;
@@ -32,7 +42,8 @@ public class TargetPoint : MonoBehaviour
 
             isCompleted = true;
             TargetPointManager.Instance?.OnPointCompleted(this);
-            Destroy(gameObject);
+
+            LeanPool.Despawn(gameObject);
         }
     }
 }

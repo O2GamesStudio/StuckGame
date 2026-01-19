@@ -125,6 +125,7 @@ public class TargetCtrl : MonoBehaviour
 
         HandleReverseRotationState();
     }
+
     void HandleReverseRotationState()
     {
         switch (rotationState)
@@ -211,6 +212,7 @@ public class TargetCtrl : MonoBehaviour
                     .SetEase(Ease.InQuad);
             });
     }
+
     public void OnGameOverHit()
     {
         transform.DOKill();
@@ -310,6 +312,7 @@ public class TargetCtrl : MonoBehaviour
             .Append(transform.DOScale(originalScale, scaleDuration)
             .SetEase(Ease.InBack));
     }
+
     public void StopRotationOnly()
     {
         isRotating = false;
@@ -318,6 +321,7 @@ public class TargetCtrl : MonoBehaviour
             rb.angularVelocity = 0f;
         }
     }
+
     void LaunchKnives(StuckObj[] knives)
     {
         foreach (StuckObj knife in knives)

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Lean.Pool;
 
 public class GameManager : MonoBehaviour
 {
@@ -45,7 +46,6 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        Application.targetFrameRate = 60;
     }
 
     void Start()
@@ -212,7 +212,8 @@ public class GameManager : MonoBehaviour
             Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.up;
             Vector3 spawnPosition = targetCharacter.transform.position + direction * (targetRadius + stickOffset);
 
-            StuckObj obstacle = Instantiate(currentStuckObjPrefab, spawnPosition, rotation);
+            // LeanPool.Spawn 사용
+            StuckObj obstacle = LeanPool.Spawn(currentStuckObjPrefab, spawnPosition, rotation);
 
             Vector3 worldPos = obstacle.transform.position;
             Quaternion worldRot = obstacle.transform.rotation;
@@ -228,6 +229,7 @@ public class GameManager : MonoBehaviour
 
         return usedAngles;
     }
+
     List<float> GetTargetPointAngles()
     {
         List<float> angles = new List<float>();
@@ -262,7 +264,8 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        currentKnife = Instantiate(currentStuckObjPrefab, spawnPoint.position, Quaternion.identity);
+        // LeanPool.Spawn 사용
+        currentKnife = LeanPool.Spawn(currentStuckObjPrefab, spawnPoint.position, Quaternion.identity);
         allKnives.Add(currentKnife);
     }
 
@@ -308,7 +311,8 @@ public class GameManager : MonoBehaviour
 
         if (currentKnife != null)
         {
-            Destroy(currentKnife.gameObject);
+            // LeanPool.Despawn 사용
+            LeanPool.Despawn(currentKnife);
             currentKnife = null;
         }
 
@@ -348,14 +352,33 @@ public class GameManager : MonoBehaviour
 
     void ClearAllKnives()
     {
+        // allKnives 리스트에 있는 모든 나이프 제거
         foreach (var knife in allKnives)
         {
             if (knife != null)
             {
-                Destroy(knife.gameObject);
+                // 부모 관계 해제 (TargetCharacter에 붙어있을 수 있음)
+                knife.transform.SetParent(null);
+
+                // LeanPool.Despawn 사용
+                LeanPool.Despawn(knife);
             }
         }
         allKnives.Clear();
+
+        // TargetCharacter에 직접 붙어있을 수 있는 나이프들도 확인하여 제거
+        if (targetCharacter != null)
+        {
+            StuckObj[] remainingKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
+            foreach (StuckObj knife in remainingKnives)
+            {
+                if (knife != null)
+                {
+                    knife.transform.SetParent(null);
+                    LeanPool.Despawn(knife);
+                }
+            }
+        }
 
         if (targetPointManager != null)
         {
@@ -453,6 +476,7 @@ public class GameManager : MonoBehaviour
             });
         }
     }
+
     public void ContinueGame()
     {
         isGameOver = false;
@@ -465,6 +489,7 @@ public class GameManager : MonoBehaviour
 
         SpawnNewKnife();
     }
+
     public void RestartStage()
     {
         DOTween.KillAll();
@@ -472,6 +497,7 @@ public class GameManager : MonoBehaviour
         ClearAllKnives();
 
         isGameActive = true;
+        isGameOver = false;
 
         InitializeStage();
         SpawnNewKnife();

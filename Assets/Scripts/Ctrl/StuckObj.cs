@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using Lean.Pool;
 
 public class StuckObj : MonoBehaviour
 {
@@ -11,9 +12,14 @@ public class StuckObj : MonoBehaviour
     [Header("VFX")]
     [SerializeField] GameObject stuckVFXPrefab;
 
+    [Header("SFX")]
+    [SerializeField] AudioClip hitTargetSFX;
+    [SerializeField] AudioClip hitKnifeSFX;
+
     [Header("Collision Fail Settings")]
     [SerializeField] float fallGravityScale = 2f;
     [SerializeField] float fallRotationSpeed = 360f;
+    [SerializeField] float despawnDelay = 3f;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -34,15 +40,46 @@ public class StuckObj : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Dynamic;
     }
 
+    // LeanPool을 사용할 때 오브젝트가 재사용되므로 OnSpawn에서 초기화
+    void OnSpawn()
+    {
+        isStuck = false;
+        isLaunched = false;
+        isStuckToTarget = false;
+        isFalling = false;
+        hasTriggeredGameOver = false;
+
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 0;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        transform.SetParent(null);
+    }
 
     void TriggerStuckObjCollision(Vector2 contactPoint)
     {
+        // 나이프 충돌 사운드 재생
+        if (hitKnifeSFX != null)
+        {
+            SoundManager.Instance?.PlaySFX(hitKnifeSFX);
+        }
+
         if (VFXManager.Instance != null)
         {
             GameObject vfxPrefab = VFXManager.Instance.GetGameOverVFX();
             if (vfxPrefab != null)
             {
-                Instantiate(vfxPrefab, contactPoint, Quaternion.identity);
+                // VFX도 LeanPool 사용 가능
+                LeanPool.Spawn(vfxPrefab, contactPoint, Quaternion.identity);
             }
         }
 
@@ -111,6 +148,12 @@ public class StuckObj : MonoBehaviour
 
         if (co.transform.CompareTag("Target"))
         {
+            // 타겟에 박힐 때 사운드 재생
+            if (hitTargetSFX != null)
+            {
+                SoundManager.Instance?.PlaySFX(hitTargetSFX);
+            }
+
             StickToTarget(co);
 
             TargetCtrl targetCtrl = co.transform.GetComponent<TargetCtrl>();
@@ -141,7 +184,14 @@ public class StuckObj : MonoBehaviour
 
         rb.linearVelocity = new Vector2(0f, 0f);
 
-        Destroy(gameObject, 3f);
+        // Destroy 대신 LeanPool.Despawn을 지연 호출
+        StartCoroutine(DespawnAfterDelay(despawnDelay));
+    }
+
+    IEnumerator DespawnAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        LeanPool.Despawn(gameObject);
     }
 
     void IgnoreStuckObjCollisions()
@@ -182,7 +232,8 @@ public class StuckObj : MonoBehaviour
 
         if (stuckVFXPrefab != null)
         {
-            Instantiate(stuckVFXPrefab, hitPoint, Quaternion.identity);
+            // VFX도 LeanPool 사용 가능
+            LeanPool.Spawn(stuckVFXPrefab, hitPoint, Quaternion.identity);
         }
     }
 
@@ -230,5 +281,23 @@ public class StuckObj : MonoBehaviour
     public Collider2D GetCollider()
     {
         return col;
+    }
+
+    void OnDespawn()
+    {
+        StopAllCoroutines();
+
+        if (GameManager.Instance != null && col != null)
+        {
+            List<StuckObj> allKnives = GameManager.Instance.GetAllKnives();
+            foreach (StuckObj other in allKnives)
+            {
+                if (other != null && other != this && other.GetCollider() != null)
+                {
+                    Physics2D.IgnoreCollision(col, other.GetCollider(), false);
+                }
+            }
+        }
+        transform.SetParent(null);
     }
 }
