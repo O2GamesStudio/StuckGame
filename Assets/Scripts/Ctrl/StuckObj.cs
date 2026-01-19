@@ -1,18 +1,25 @@
-// StuckObj.cs - 수정된 부분
+// StuckObj.cs - 전체 코드
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
 public class StuckObj : MonoBehaviour
 {
     [Header("Stick Settings")]
-    [SerializeField] private float targetStickOffset = 0.3f;
-    [SerializeField] private float borderStickOffset = 0.3f;
+    [SerializeField] float targetStickOffset = 0.3f;
+    [SerializeField] float borderStickOffset = 0.3f;
+
+    [Header("Collision Fail Settings")]
+    [SerializeField] float fallGravityScale = 2f;
+    [SerializeField] float fallRotationSpeed = 360f;
+    [SerializeField] float gameOverDelay = 0.5f;
 
     private Rigidbody2D rb;
     private Collider2D col;
     private bool isStuck = false;
     private bool isLaunched = false;
     private bool isStuckToTarget = false;
+    private bool isFalling = false;
 
     void Awake()
     {
@@ -42,7 +49,7 @@ public class StuckObj : MonoBehaviour
             return;
         }
 
-        if (isStuck) return;
+        if (isStuck || isFalling) return;
 
         if (co.transform.CompareTag("Target"))
         {
@@ -58,15 +65,49 @@ public class StuckObj : MonoBehaviour
         }
         else if (co.transform.CompareTag("StuckObj"))
         {
-            Stick(co.transform);
+            GameManager.Instance.OnKnifeCollision();
+            col.enabled = false;
+
+            StartFalling();
+            IgnoreStuckObjCollisions();
             StartCoroutine(GameOverAfterDelay());
         }
     }
 
+    void StartFalling()
+    {
+        isFalling = true;
+
+        rb.gravityScale = fallGravityScale;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+
+        float rotationDirection = Random.value > 0.5f ? 1f : -1f;
+        rb.angularVelocity = fallRotationSpeed * rotationDirection;
+
+        rb.linearVelocity = new Vector2(0f, 0f);
+
+        Destroy(gameObject, 3f);
+    }
+
     IEnumerator GameOverAfterDelay()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(gameOverDelay);
         GameManager.Instance.GameOver();
+    }
+
+    void IgnoreStuckObjCollisions()
+    {
+        if (GameManager.Instance == null) return;
+
+        List<StuckObj> allKnives = GameManager.Instance.GetAllKnives();
+
+        foreach (StuckObj other in allKnives)
+        {
+            if (other != null && other != this && other.GetCollider() != null)
+            {
+                Physics2D.IgnoreCollision(col, other.GetCollider(), true);
+            }
+        }
     }
 
     void StickToTarget(Collision2D collision)
@@ -137,8 +178,6 @@ public class StuckObj : MonoBehaviour
         rb.gravityScale = 1;
         rb.linearVelocity = direction.normalized * force;
         rb.angularVelocity = Random.Range(-360f, 360f);
-
-        Destroy(gameObject, 5f);
     }
 
     public void StickAsObstacle(Transform target)

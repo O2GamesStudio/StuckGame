@@ -106,8 +106,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 366a21fb3f5714f47aad02a86bc16d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StuckObj
-  targetStickOffset: 1
+  targetStickOffset: 0.9
   borderStickOffset: -0.2
+  fallGravityScale: 2
+  fallRotationSpeed: 360
+  gameOverDelay: 0.3
 --- !u!50 &4806536573623460759
 Rigidbody2D:
   serializedVersion: 5

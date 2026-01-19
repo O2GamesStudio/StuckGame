@@ -13,6 +13,12 @@ public class TargetCtrl : MonoBehaviour
     [Header("Hit Feedback Settings")]
     [SerializeField] float hitAlphaValue = 0.3f;
     [SerializeField] float hitFadeDuration = 0.15f;
+    [SerializeField] float hitPunchY = 0.2f;
+    [SerializeField] float hitPunchDuration = 0.15f;
+
+    [Header("GameOver Feedback Settings")]
+    [SerializeField] float gameOverPunchY = 0.5f;
+    [SerializeField] float gameOverPunchDuration = 0.3f;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -189,6 +195,27 @@ public class TargetCtrl : MonoBehaviour
                     spriteRenderer.DOFade(1f, hitFadeDuration);
                 });
         }
+
+        // Y축 펀치 효과
+        transform.DOKill();
+        transform.DOMoveY(transform.position.y + hitPunchY, hitPunchDuration * 0.5f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                transform.DOMoveY(transform.position.y - hitPunchY, hitPunchDuration * 0.5f)
+                    .SetEase(Ease.InQuad);
+            });
+    }
+    public void OnGameOverHit()
+    {
+        transform.DOKill();
+        transform.DOMoveY(transform.position.y + gameOverPunchY, gameOverPunchDuration * 0.5f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                transform.DOMoveY(transform.position.y - gameOverPunchY, gameOverPunchDuration * 0.5f)
+                    .SetEase(Ease.InQuad);
+            });
     }
 
     public void ClearStage()
@@ -258,11 +285,7 @@ public class TargetCtrl : MonoBehaviour
         {
             col.enabled = false;
         }
-
-        // 부모 해제 전에 칼들 가져오기
         StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
-
-        // 칼들의 부모를 먼저 해제
         foreach (StuckObj knife in stuckKnives)
         {
             if (knife != null)

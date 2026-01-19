@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
         SpawnNewKnife();
         UpdateUI();
     }
+    public void SetGameActive(bool active) => isGameActive = active;
     void InitializeStage()
     {
         if (currentChapter == null)
@@ -71,10 +72,8 @@ public class GameManager : MonoBehaviour
         stuckAmount = 0;
         isGameOver = false;
 
-        // 장애물 생성하고 사용된 각도 리스트 받기
         List<float> occupiedAngles = SpawnObstacles(stageSettings.obstacleCount);
 
-        // 목표 지점 초기화 (장애물 각도를 전달하여 겹치지 않게)
         if (targetPointManager != null)
         {
             targetPointManager.SetTargetCharacter(targetCharacter);
@@ -85,8 +84,21 @@ public class GameManager : MonoBehaviour
     }
     public void OnTargetPointCompleted()
     {
-        // 목표 지점 완료 시 호출됨
         Debug.Log("Target point completed!");
+    }
+    public List<StuckObj> GetAllKnives()
+    {
+        return allKnives;
+    }
+    public void OnKnifeCollision()
+    {
+        isGameActive = false;
+
+        // 즉시 Target의 GameOver 펀치 효과
+        if (targetCharacter != null)
+        {
+            targetCharacter.OnGameOverHit();
+        }
     }
 
     List<float> SpawnObstacles(int count)
@@ -310,6 +322,7 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         isGameActive = false;
+
         DisableKnifeCollisions();
 
         if (targetCharacter != null)

@@ -875,6 +875,10 @@ MonoBehaviour:
   scaleDuration: 0.3
   hitAlphaValue: 0.8
   hitFadeDuration: 0.05
+  hitPunchY: 0.1
+  hitPunchDuration: 0.05
+  gameOverPunchY: 0.5
+  gameOverPunchDuration: 0.1
 --- !u!50 &876745120
 Rigidbody2D:
   serializedVersion: 5
