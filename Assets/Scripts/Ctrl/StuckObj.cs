@@ -65,9 +65,27 @@ public class StuckObj : MonoBehaviour
         }
         else if (co.transform.CompareTag("StuckObj"))
         {
-            GameManager.Instance.OnKnifeCollision();
-            col.enabled = false;
+            // VFXManager에서 Prefab 가져와서 생성
+            if (VFXManager.Instance != null)
+            {
+                GameObject vfxPrefab = VFXManager.Instance.GetGameOverVFX();
+                if (vfxPrefab != null)
+                {
+                    ContactPoint2D contact = co.GetContact(0);
+                    Instantiate(vfxPrefab, contact.point, Quaternion.identity);
+                }
+            }
 
+            // GameManager를 통해 충돌 처리
+            GameManager.Instance.OnKnifeCollision();
+
+            // Collider 비활성화
+            if (col != null)
+            {
+                col.enabled = false;
+            }
+
+            // 회전하면서 떨어지기
             StartFalling();
             IgnoreStuckObjCollisions();
             StartCoroutine(GameOverAfterDelay());
