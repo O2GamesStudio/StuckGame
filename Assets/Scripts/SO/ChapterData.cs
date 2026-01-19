@@ -28,7 +28,8 @@ public class ChapterData : ScriptableObject
         public int requiredKnives = 10;
         [Range(0, 20)]
         public int obstacleCount = 0;
-
+        [Range(0, 10)]
+        public int targetPointCount = 0; // 필수 목표 지점 개수
     }
 
     [SerializeField] private string chapterName;

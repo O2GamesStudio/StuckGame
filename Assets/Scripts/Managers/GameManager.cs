@@ -21,12 +21,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] ChapterData currentChapter;
     [SerializeField] int currentStageIndex = 0; // 0~9 (스테이지 1~10)
 
+    [Header("Target Points")]
+    [SerializeField] TargetPointManager targetPointManager;
+
     private StuckObj currentKnife;
     private bool isGameOver = false;
     private bool isGameActive = false;
     private List<StuckObj> allKnives = new List<StuckObj>();
     private int stuckAmount = 0;
     private int targetStuckVal = 10;
+
+
 
     void Awake()
     {
@@ -66,14 +71,29 @@ public class GameManager : MonoBehaviour
         stuckAmount = 0;
         isGameOver = false;
 
-        SpawnObstacles(stageSettings.obstacleCount);
-        UpdateStageText();
+        // 장애물 생성하고 사용된 각도 리스트 받기
+        List<float> occupiedAngles = SpawnObstacles(stageSettings.obstacleCount);
 
+        // 목표 지점 초기화 (장애물 각도를 전달하여 겹치지 않게)
+        if (targetPointManager != null)
+        {
+            targetPointManager.SetTargetCharacter(targetCharacter);
+            targetPointManager.InitializeTargetPoints(stageSettings.targetPointCount, occupiedAngles);
+        }
+
+        UpdateStageText();
+    }
+    public void OnTargetPointCompleted()
+    {
+        // 목표 지점 완료 시 호출됨
+        Debug.Log("Target point completed!");
     }
 
-    void SpawnObstacles(int count)
+    List<float> SpawnObstacles(int count)
     {
-        if (count <= 0 || targetCharacter == null) return;
+        List<float> usedAngles = new List<float>();
+
+        if (count <= 0 || targetCharacter == null) return usedAngles;
 
         CircleCollider2D targetCollider = targetCharacter.GetComponent<CircleCollider2D>();
         float targetRadius = 1f;
@@ -92,8 +112,6 @@ public class GameManager : MonoBehaviour
         }
 
         float minAngleGap = 15f;
-
-        List<float> usedAngles = new List<float>();
 
         for (int i = 0; i < count; i++)
         {
@@ -140,7 +158,8 @@ public class GameManager : MonoBehaviour
             allKnives.Add(obstacle);
         }
 
-        Debug.Log($"Spawned {count} obstacles with radius: {targetRadius}, knife length: {knifeLength}");
+        Debug.Log($"Spawned {count} obstacles");
+        return usedAngles; // 사용된 각도 리스트 반환
     }
 
     void UpdateStageText()
@@ -192,6 +211,14 @@ public class GameManager : MonoBehaviour
 
     void StageComplete()
     {
+        if (targetPointManager != null && targetPointManager.GetRequiredCount() > 0)
+        {
+            if (!targetPointManager.AreAllPointsCompleted())
+            {
+                return;
+            }
+        }
+
         isGameActive = false;
 
         if (currentKnife != null)
@@ -241,7 +268,6 @@ public class GameManager : MonoBehaviour
 
     void ClearAllKnives()
     {
-        // 리스트에 있는 모든 칼 제거
         foreach (var knife in allKnives)
         {
             if (knife != null)
@@ -250,6 +276,12 @@ public class GameManager : MonoBehaviour
             }
         }
         allKnives.Clear();
+
+        // 목표 지점도 정리
+        if (targetPointManager != null)
+        {
+            targetPointManager.ClearAllPoints();
+        }
     }
 
     void ChapterComplete()

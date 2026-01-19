@@ -28,8 +28,9 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 100
+    requiredKnives: 10
     obstacleCount: 3
+    targetPointCount: 3
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -45,6 +46,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -60,6 +62,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -75,6 +78,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -90,6 +94,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -105,6 +110,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -120,6 +126,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -135,6 +142,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -150,6 +158,7 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0
   - minStartSpeed: 30
     maxStartSpeed: 80
     minSpeedChangeRate: 50
@@ -165,3 +174,4 @@ MonoBehaviour:
     reverseDirection: 1
     requiredKnives: 10
     obstacleCount: 0
+    targetPointCount: 0

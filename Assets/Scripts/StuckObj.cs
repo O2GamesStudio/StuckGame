@@ -1,12 +1,18 @@
+// StuckObj.cs - 수정된 부분
 using System.Collections;
 using UnityEngine;
 
 public class StuckObj : MonoBehaviour
 {
+    [Header("Stick Settings")]
+    [SerializeField] private float targetStickOffset = 0.3f;
+    [SerializeField] private float borderStickOffset = 0.3f;
+
     private Rigidbody2D rb;
     private Collider2D col;
     private bool isStuck = false;
     private bool isLaunched = false;
+    private bool isStuckToTarget = false;
 
     void Awake()
     {
@@ -24,7 +30,6 @@ public class StuckObj : MonoBehaviour
         rb.linearVelocity = Vector2.up * force;
     }
 
-
     void OnCollisionEnter2D(Collision2D co)
     {
         Debug.Log(co.transform.name);
@@ -41,7 +46,7 @@ public class StuckObj : MonoBehaviour
 
         if (co.transform.CompareTag("Target"))
         {
-            Stick(co.transform);
+            StickToTarget(co);
 
             TargetCtrl targetCtrl = co.transform.GetComponent<TargetCtrl>();
             if (targetCtrl != null)
@@ -64,6 +69,29 @@ public class StuckObj : MonoBehaviour
         GameManager.Instance.GameOver();
     }
 
+    void StickToTarget(Collision2D collision)
+    {
+        isStuck = true;
+        isStuckToTarget = true;
+
+        ContactPoint2D contact = collision.GetContact(0);
+        Vector2 hitPoint = contact.point;
+
+        Vector2 centerToHit = (hitPoint - (Vector2)collision.transform.position).normalized;
+
+        float angle = Mathf.Atan2(centerToHit.y, centerToHit.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        Vector2 offset = centerToHit * targetStickOffset;
+        transform.position = hitPoint + offset;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+
+        transform.SetParent(collision.transform);
+    }
+
     void Stick(Transform target)
     {
         isStuck = true;
@@ -72,6 +100,16 @@ public class StuckObj : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
 
         transform.SetParent(target);
+
+        if (target.CompareTag("Target"))
+        {
+            isStuckToTarget = true;
+        }
+    }
+
+    public bool IsStuckToTarget()
+    {
+        return isStuckToTarget;
     }
 
     void StickToBorder(Collision2D collision)
@@ -86,7 +124,7 @@ public class StuckObj : MonoBehaviour
         rb.angularVelocity = 0f;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        Vector2 offset = -hitNormal * 0.3f;
+        Vector2 offset = -hitNormal * borderStickOffset;
         transform.position = hitPoint + offset;
     }
 
@@ -95,7 +133,6 @@ public class StuckObj : MonoBehaviour
         isLaunched = true;
         isStuck = false;
 
-        // 물리 활성화
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 1;
         rb.linearVelocity = direction.normalized * force;
@@ -103,6 +140,7 @@ public class StuckObj : MonoBehaviour
 
         Destroy(gameObject, 5f);
     }
+
     public void StickAsObstacle(Transform target)
     {
         isStuck = true;
@@ -110,7 +148,6 @@ public class StuckObj : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
         rb.bodyType = RigidbodyType2D.Kinematic;
-
     }
 
     public Collider2D GetCollider()
