@@ -338,6 +338,7 @@ MonoBehaviour:
   throwForce: 70
   spawnDelay: 0.1
   stageTransitionDelay: 1
+  gameOverDelay: 0.1
   currentChapter: {fileID: 11400000, guid: 03304a5993c0057428c65c4cbc1293a9, type: 2}
   currentStageIndex: 0
   targetPointManager: {fileID: 1794058107}

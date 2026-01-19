@@ -305,7 +305,14 @@ public class TargetCtrl : MonoBehaviour
             .Append(transform.DOScale(originalScale, scaleDuration)
             .SetEase(Ease.InBack));
     }
-
+    public void StopRotationOnly()
+    {
+        isRotating = false;
+        if (rb != null)
+        {
+            rb.angularVelocity = 0f;
+        }
+    }
     void LaunchKnives(StuckObj[] knives)
     {
         foreach (StuckObj knife in knives)

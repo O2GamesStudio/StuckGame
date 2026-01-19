@@ -80,7 +80,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 4304f050ec5d2094986a9aa8c90c2f62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -105,5 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameOverVFXCtrl
   maxScale: 1.5
-  scaleDuration: 0.5
-  fadeDuration: 0.3
+  scaleDuration: 0.2
+  fadeDuration: 0.2
+  startAlpha: 0
+  maxAlpha: 0.5
+  endAlpha: 0

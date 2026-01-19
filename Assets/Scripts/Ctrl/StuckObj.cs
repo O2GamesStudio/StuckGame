@@ -12,7 +12,6 @@ public class StuckObj : MonoBehaviour
     [Header("Collision Fail Settings")]
     [SerializeField] float fallGravityScale = 2f;
     [SerializeField] float fallRotationSpeed = 360f;
-    [SerializeField] float gameOverDelay = 0.5f;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -65,7 +64,6 @@ public class StuckObj : MonoBehaviour
         }
         else if (co.transform.CompareTag("StuckObj"))
         {
-            // VFXManager에서 Prefab 가져와서 생성
             if (VFXManager.Instance != null)
             {
                 GameObject vfxPrefab = VFXManager.Instance.GetGameOverVFX();
@@ -76,19 +74,14 @@ public class StuckObj : MonoBehaviour
                 }
             }
 
-            // GameManager를 통해 충돌 처리
             GameManager.Instance.OnKnifeCollision();
 
-            // Collider 비활성화
             if (col != null)
             {
                 col.enabled = false;
             }
-
-            // 회전하면서 떨어지기
             StartFalling();
             IgnoreStuckObjCollisions();
-            StartCoroutine(GameOverAfterDelay());
         }
     }
 
@@ -105,12 +98,6 @@ public class StuckObj : MonoBehaviour
         rb.linearVelocity = new Vector2(0f, 0f);
 
         Destroy(gameObject, 3f);
-    }
-
-    IEnumerator GameOverAfterDelay()
-    {
-        yield return new WaitForSeconds(gameOverDelay);
-        GameManager.Instance.GameOver();
     }
 
     void IgnoreStuckObjCollisions()

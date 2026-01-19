@@ -8,6 +8,11 @@ public class GameOverVFX : MonoBehaviour
     [SerializeField] float scaleDuration = 0.5f;
     [SerializeField] float fadeDuration = 0.3f;
 
+    [Header("Alpha Settings")]
+    [SerializeField] float startAlpha = 0f;
+    [SerializeField] float maxAlpha = 1f;
+    [SerializeField] float endAlpha = 0f;
+
     private SpriteRenderer spriteRenderer;
 
     void Awake()
@@ -17,7 +22,7 @@ public class GameOverVFX : MonoBehaviour
         if (spriteRenderer != null)
         {
             Color color = spriteRenderer.color;
-            color.a = 0f;
+            color.a = startAlpha;
             spriteRenderer.color = color;
         }
     }
@@ -36,8 +41,8 @@ public class GameOverVFX : MonoBehaviour
         transform.localScale = Vector3.zero;
         sequence.Append(transform.DOScale(maxScale, scaleDuration).SetEase(Ease.OutQuad));
 
-        sequence.Join(spriteRenderer.DOFade(1f, fadeDuration * 0.5f).SetEase(Ease.OutQuad));
-        sequence.Append(spriteRenderer.DOFade(0f, fadeDuration * 0.5f).SetEase(Ease.InQuad));
+        sequence.Join(spriteRenderer.DOFade(maxAlpha, fadeDuration * 0.5f).SetEase(Ease.OutQuad));
+        sequence.Append(spriteRenderer.DOFade(endAlpha, fadeDuration * 0.5f).SetEase(Ease.InQuad));
 
         sequence.OnComplete(() => Destroy(gameObject));
     }

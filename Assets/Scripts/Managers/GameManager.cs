@@ -15,11 +15,12 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] float throwForce = 10f;
     [SerializeField] float spawnDelay = 0.5f;
-    [SerializeField] float stageTransitionDelay = 1f; // 스테이지 전환 딜레이
+    [SerializeField] float stageTransitionDelay = 1f;
+    [SerializeField] float gameOverDelay = 0.5f;
 
     [Header("Chapter & Stage")]
     [SerializeField] ChapterData currentChapter;
-    [SerializeField] int currentStageIndex = 0; // 0~9 (스테이지 1~10)
+    [SerializeField] int currentStageIndex = 0;
 
     [Header("Target Points")]
     [SerializeField] TargetPointManager targetPointManager;
@@ -94,11 +95,17 @@ public class GameManager : MonoBehaviour
     {
         isGameActive = false;
 
-        // 즉시 Target의 GameOver 펀치 효과
         if (targetCharacter != null)
         {
+            targetCharacter.StopRotationOnly();
             targetCharacter.OnGameOverHit();
         }
+        StartCoroutine(GameOverAfterDelay());
+    }
+    IEnumerator GameOverAfterDelay()
+    {
+        yield return new WaitForSeconds(gameOverDelay);
+        GameOver();
     }
 
     List<float> SpawnObstacles(int count)
