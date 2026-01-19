@@ -9,6 +9,9 @@ public class StuckObj : MonoBehaviour
     [SerializeField] float targetStickOffset = 0.3f;
     [SerializeField] float borderStickOffset = 0.3f;
 
+    [Header("VFX")]
+    [SerializeField] GameObject stuckVFXPrefab;
+
     [Header("Collision Fail Settings")]
     [SerializeField] float fallGravityScale = 2f;
     [SerializeField] float fallRotationSpeed = 360f;
@@ -136,6 +139,11 @@ public class StuckObj : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
 
         transform.SetParent(collision.transform);
+
+        if (stuckVFXPrefab != null)
+        {
+            Instantiate(stuckVFXPrefab, hitPoint, Quaternion.identity);
+        }
     }
 
     void Stick(Transform target)

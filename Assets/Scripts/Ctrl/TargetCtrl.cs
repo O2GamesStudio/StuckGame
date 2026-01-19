@@ -70,7 +70,6 @@ public class TargetCtrl : MonoBehaviour
 
     public void InitializeStage(ChapterData.StageSettings settings)
     {
-        // ScriptableObject에서 설정값 받아오기
         minStartSpeed = settings.minStartSpeed;
         maxStartSpeed = settings.maxStartSpeed;
         minMaxSpeed = settings.minMaxSpeed;

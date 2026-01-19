@@ -23,7 +23,7 @@ MonoBehaviour:
     minSpeedChangeRate: 50
     maxSpeedChangeRate: 100
     minMaxSpeed: 100
-    maxMaxSpeed: 300
+    maxMaxSpeed: 200
     accelerationRatio: 0.3
     rotateClockwise: 1
     minHoldTime: 1
@@ -32,7 +32,7 @@ MonoBehaviour:
     reverseWaitTime: 0.3
     reverseDirection: 1
     requiredKnives: 10
-    obstacleCount: 0
+    obstacleCount: 3
     targetPointCount: 3
   - bgImage: {fileID: -7443756053782179069, guid: 5528f6f868d5c214a9b78d62f08bb1f5, type: 3}
     targetImage: {fileID: -3347910513992916872, guid: 2bd3ffb7f82ad0e48a5b32a986fbbe6b, type: 3}

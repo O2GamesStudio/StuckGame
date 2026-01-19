@@ -106,8 +106,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 366a21fb3f5714f47aad02a86bc16d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StuckObj
-  targetStickOffset: 0.9
+  targetStickOffset: 1.3
   borderStickOffset: -0.2
+  stuckVFXPrefab: {fileID: 8779126222322074769, guid: 34d080c9566222e49a15d60069ec86c5, type: 3}
   fallGravityScale: 2
   fallRotationSpeed: 360
 --- !u!50 &4806536573623460759
