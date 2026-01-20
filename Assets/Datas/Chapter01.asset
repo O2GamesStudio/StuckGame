@@ -91,3 +91,22 @@ MonoBehaviour:
     requiredKnives: 10
     obstacleCount: 3
     targetPointCount: 3
+  - bgImage: {fileID: 21300000, guid: cfd65a04c0f631f4198148c691e83c36, type: 3}
+    targetImage: {fileID: -6349360636359246829, guid: 246ec04f8f1ac5746b9e42589eb9669e, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 0e49871bb63cc38429be2ea1f6294e90, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.3
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+    obstacleCount: 3
+    targetPointCount: 3

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Lean.Pool;
+using System.Collections;
 
 public class TargetPoint : MonoBehaviour
 {
@@ -17,13 +17,42 @@ public class TargetPoint : MonoBehaviour
         pointCollider.isTrigger = true;
     }
 
-    void OnSpawn()
+    void Start()
     {
-        isCompleted = false;
-        if (pointCollider != null)
+        StartCoroutine(CheckOverlapNextFrame());
+    }
+
+    IEnumerator CheckOverlapNextFrame()
+    {
+        yield return new WaitForFixedUpdate();
+        CheckOverlapWithObstacles();
+    }
+
+    void CheckOverlapWithObstacles()
+    {
+        Collider2D[] overlaps = Physics2D.OverlapCircleAll(transform.position, 0.5f);
+
+        foreach (Collider2D overlap in overlaps)
         {
-            pointCollider.enabled = true;
+            if (overlap.CompareTag("StuckObj"))
+            {
+                StuckObj stuckObj = overlap.GetComponent<StuckObj>();
+                if (stuckObj != null && stuckObj.IsStuckToTarget())
+                {
+                    CompletePoint();
+                    return;
+                }
+            }
         }
+    }
+
+    void CompletePoint()
+    {
+        if (isCompleted) return;
+
+        isCompleted = true;
+        TargetPointManager.Instance?.OnPointCompleted(this);
+        Destroy(gameObject);
     }
 
     public bool IsCompleted => isCompleted;
@@ -35,15 +64,10 @@ public class TargetPoint : MonoBehaviour
         if (collision.CompareTag("StuckObj"))
         {
             StuckObj stuckObj = collision.GetComponent<StuckObj>();
-            if (stuckObj != null && stuckObj.IsStuckToTarget())
+            if (stuckObj != null)
             {
-                return;
+                CompletePoint();
             }
-
-            isCompleted = true;
-            TargetPointManager.Instance?.OnPointCompleted(this);
-
-            LeanPool.Despawn(gameObject);
         }
     }
 }

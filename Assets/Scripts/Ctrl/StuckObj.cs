@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Lean.Pool;
 
-public class StuckObj : MonoBehaviour
+public class StuckObj : MonoBehaviour, IPoolable
 {
     [Header("Stick Settings")]
     [SerializeField] float targetStickOffset = 0.3f;
@@ -40,9 +40,45 @@ public class StuckObj : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Dynamic;
     }
 
-    // LeanPool을 사용할 때 오브젝트가 재사용되므로 OnSpawn에서 초기화
-    void OnSpawn()
+    void OnEnable()
     {
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+    }
+
+    void IPoolable.OnSpawn()
+    {
+        ResetForSpawn();
+    }
+
+    void IPoolable.OnDespawn()
+    {
+        StopAllCoroutines();
+
+        if (GameManager.Instance != null && col != null)
+        {
+            List<StuckObj> allKnives = GameManager.Instance.GetAllKnives();
+            foreach (StuckObj other in allKnives)
+            {
+                if (other != null && other != this && other.GetCollider() != null)
+                {
+                    Physics2D.IgnoreCollision(col, other.GetCollider(), false);
+                }
+            }
+        }
+
+        transform.SetParent(null);
+    }
+
+    public void ResetForSpawn()
+    {
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
         isStuck = false;
         isLaunched = false;
         isStuckToTarget = false;
@@ -55,6 +91,8 @@ public class StuckObj : MonoBehaviour
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
+            rb.constraints = RigidbodyConstraints2D.None;
+            rb.isKinematic = false;
         }
 
         if (col != null)
@@ -63,11 +101,23 @@ public class StuckObj : MonoBehaviour
         }
 
         transform.SetParent(null);
+        transform.rotation = Quaternion.identity;
+    }
+
+    public void SetupAsObstacle()
+    {
+        isStuck = true;
+
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     void TriggerStuckObjCollision(Vector2 contactPoint)
     {
-        // 나이프 충돌 사운드 재생
         if (hitKnifeSFX != null)
         {
             SoundManager.Instance?.PlaySFX(hitKnifeSFX);
@@ -78,7 +128,6 @@ public class StuckObj : MonoBehaviour
             GameObject vfxPrefab = VFXManager.Instance.GetGameOverVFX();
             if (vfxPrefab != null)
             {
-                // VFX도 LeanPool 사용 가능
                 LeanPool.Spawn(vfxPrefab, contactPoint, Quaternion.identity);
             }
         }
@@ -128,7 +177,7 @@ public class StuckObj : MonoBehaviour
 
     public void Throw(float force)
     {
-        if (isStuck) return;
+        if (isStuck || rb == null) return;
 
         rb.linearVelocity = Vector2.up * force;
     }
@@ -148,7 +197,6 @@ public class StuckObj : MonoBehaviour
 
         if (co.transform.CompareTag("Target"))
         {
-            // 타겟에 박힐 때 사운드 재생
             if (hitTargetSFX != null)
             {
                 SoundManager.Instance?.PlaySFX(hitTargetSFX);
@@ -184,7 +232,6 @@ public class StuckObj : MonoBehaviour
 
         rb.linearVelocity = new Vector2(0f, 0f);
 
-        // Destroy 대신 LeanPool.Despawn을 지연 호출
         StartCoroutine(DespawnAfterDelay(despawnDelay));
     }
 
@@ -232,7 +279,6 @@ public class StuckObj : MonoBehaviour
 
         if (stuckVFXPrefab != null)
         {
-            // VFX도 LeanPool 사용 가능
             LeanPool.Spawn(stuckVFXPrefab, hitPoint, Quaternion.identity);
         }
     }
@@ -281,23 +327,5 @@ public class StuckObj : MonoBehaviour
     public Collider2D GetCollider()
     {
         return col;
-    }
-
-    void OnDespawn()
-    {
-        StopAllCoroutines();
-
-        if (GameManager.Instance != null && col != null)
-        {
-            List<StuckObj> allKnives = GameManager.Instance.GetAllKnives();
-            foreach (StuckObj other in allKnives)
-            {
-                if (other != null && other != this && other.GetCollider() != null)
-                {
-                    Physics2D.IgnoreCollision(col, other.GetCollider(), false);
-                }
-            }
-        }
-        transform.SetParent(null);
     }
 }

@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        Application.targetFrameRate = 60;
     }
 
     void Start()
@@ -116,7 +117,6 @@ public class GameManager : MonoBehaviour
 
     public void OnTargetPointCompleted()
     {
-        Debug.Log("Target point completed!");
     }
 
     public List<StuckObj> GetAllKnives()
@@ -157,14 +157,7 @@ public class GameManager : MonoBehaviour
         }
 
         float stickOffset = currentStuckObjPrefab.GetTargetStickOffset();
-        float minAngleGap = 15f;
-
-        // TargetPoint들의 각도 가져오기
-        List<float> targetPointAngles = new List<float>();
-        if (targetPointManager != null)
-        {
-            targetPointAngles = GetTargetPointAngles();
-        }
+        float minAngleGap = 30f;
 
         for (int i = 0; i < count; i++)
         {
@@ -178,7 +171,6 @@ public class GameManager : MonoBehaviour
                 angle = Random.Range(0f, 360f);
                 validAngle = true;
 
-                // 기존 장애물과의 거리 체크
                 foreach (float usedAngle in usedAngles)
                 {
                     float angleDiff = Mathf.Abs(Mathf.DeltaAngle(angle, usedAngle));
@@ -189,39 +181,23 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                // TargetPoint와의 거리 체크
-                if (validAngle)
-                {
-                    foreach (float targetPointAngle in targetPointAngles)
-                    {
-                        float angleDiff = Mathf.Abs(Mathf.DeltaAngle(angle, targetPointAngle));
-                        if (angleDiff < minDistanceFromTargetPoint)
-                        {
-                            validAngle = false;
-                            break;
-                        }
-                    }
-                }
-
                 attempts++;
             }
 
             usedAngles.Add(angle);
 
-            Quaternion rotation = Quaternion.Euler(0, 0, angle + 180f);
             Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.up;
             Vector3 spawnPosition = targetCharacter.transform.position + direction * (targetRadius + stickOffset);
 
-            // LeanPool.Spawn 사용
-            StuckObj obstacle = LeanPool.Spawn(currentStuckObjPrefab, spawnPosition, rotation);
-
-            Vector3 worldPos = obstacle.transform.position;
-            Quaternion worldRot = obstacle.transform.rotation;
+            StuckObj obstacle = LeanPool.Spawn(currentStuckObjPrefab, spawnPosition, Quaternion.identity);
 
             obstacle.transform.SetParent(targetCharacter.transform);
 
-            obstacle.transform.position = worldPos;
-            obstacle.transform.rotation = worldRot;
+            Vector3 localDir = obstacle.transform.parent.InverseTransformDirection(direction);
+            float localAngle = Mathf.Atan2(localDir.y, localDir.x) * Mathf.Rad2Deg - 90f;
+            obstacle.transform.localRotation = Quaternion.Euler(0, 0, localAngle + 180f);
+
+            obstacle.SetupAsObstacle();
             obstacle.StickAsObstacle(targetCharacter.transform);
 
             allKnives.Add(obstacle);
@@ -259,13 +235,15 @@ public class GameManager : MonoBehaviour
 
     void SpawnNewKnife()
     {
-        if (isGameOver || !isGameActive)
+        if (isGameOver || !isGameActive || currentStuckObjPrefab == null || spawnPoint == null)
         {
             return;
         }
 
-        // LeanPool.Spawn 사용
         currentKnife = LeanPool.Spawn(currentStuckObjPrefab, spawnPoint.position, Quaternion.identity);
+
+        if (currentKnife == null) return;
+
         allKnives.Add(currentKnife);
     }
 
@@ -311,7 +289,6 @@ public class GameManager : MonoBehaviour
 
         if (currentKnife != null)
         {
-            // LeanPool.Despawn 사용
             LeanPool.Despawn(currentKnife);
             currentKnife = null;
         }
@@ -352,24 +329,20 @@ public class GameManager : MonoBehaviour
 
     void ClearAllKnives()
     {
-        // allKnives 리스트에 있는 모든 나이프 제거
         foreach (var knife in allKnives)
         {
             if (knife != null)
             {
-                // 부모 관계 해제 (TargetCharacter에 붙어있을 수 있음)
                 knife.transform.SetParent(null);
-
-                // LeanPool.Despawn 사용
                 LeanPool.Despawn(knife);
             }
         }
         allKnives.Clear();
 
-        // TargetCharacter에 직접 붙어있을 수 있는 나이프들도 확인하여 제거
         if (targetCharacter != null)
         {
             StuckObj[] remainingKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
+
             foreach (StuckObj knife in remainingKnives)
             {
                 if (knife != null)
@@ -479,15 +452,35 @@ public class GameManager : MonoBehaviour
 
     public void ContinueGame()
     {
+        ClearAllKnives();
+
         isGameOver = false;
         isGameActive = true;
+        stuckAmount = 0;
+
+        if (currentChapter == null) return;
+
+        ChapterData.StageSettings stageSettings = currentChapter.GetStageSettings(currentStageIndex);
+
+        currentStuckObjPrefab = stageSettings.stuckObjPrefab;
+
+        if (currentStuckObjPrefab == null) return;
 
         if (targetCharacter != null)
         {
-            targetCharacter.InitializeStage(currentChapter.GetStageSettings(currentStageIndex));
+            targetCharacter.InitializeStage(stageSettings);
+        }
+
+        List<float> occupiedAngles = SpawnObstacles(stageSettings.obstacleCount);
+
+        if (targetPointManager != null)
+        {
+            targetPointManager.SetTargetCharacter(targetCharacter);
+            targetPointManager.InitializeTargetPoints(stageSettings.targetPointCount, occupiedAngles);
         }
 
         SpawnNewKnife();
+        UpdateUI();
     }
 
     public void RestartStage()
