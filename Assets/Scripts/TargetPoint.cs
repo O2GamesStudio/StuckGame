@@ -63,6 +63,7 @@ public class TargetPoint : MonoBehaviour
 
         if (collision.CompareTag("StuckObj"))
         {
+            Debug.Log(collision.transform.name);
             StuckObj stuckObj = collision.GetComponent<StuckObj>();
             if (stuckObj != null)
             {

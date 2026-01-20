@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +33,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] float scaleDownDuration = 0.15f;
     [SerializeField] float exitButtonDelay = 0.3f;
     [SerializeField] float exitButtonScaleDuration = 0.5f;
+
+    [Header("Target Point UI")]
+    [SerializeField] GameObject targetPointIconPrefab;
+    [SerializeField] Transform targetPointIconContainer;
+
+    private List<GameObject> targetPointIcons = new List<GameObject>();
 
     public CircleMaskController circleMask;
 
@@ -146,7 +153,78 @@ public class UIManager : MonoBehaviour
         targetText.text = nowVal + "/" + targetVal;
     }
 
+    /// <summary>
+    /// Initialize target point icons based on count
+    /// </summary>
+    public void InitializeTargetPointUI(int count)
+    {
+        // Clear existing icons
+        ClearTargetPointUI();
+
+        if (targetPointIconPrefab == null || targetPointIconContainer == null)
+        {
+            Debug.LogWarning("TargetPoint UI not set up - prefab or container missing");
+            return;
+        }
+
+        // Create icons for each target point
+        for (int i = 0; i < count; i++)
+        {
+            GameObject icon = Instantiate(targetPointIconPrefab, targetPointIconContainer);
+            targetPointIcons.Add(icon);
+        }
+
+        Debug.Log($"Initialized {count} target point icons");
+    }
+
+    /// <summary>
+    /// Remove one target point icon (called when a point is completed)
+    /// </summary>
+    public void RemoveTargetPointIcon()
+    {
+        if (targetPointIcons.Count > 0)
+        {
+            GameObject iconToRemove = targetPointIcons[0];
+            targetPointIcons.RemoveAt(0);
+
+            // Animate removal (optional)
+            iconToRemove.transform.DOScale(0f, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
+            {
+                Destroy(iconToRemove);
+            });
+
+            Debug.Log($"Removed target point icon. Remaining: {targetPointIcons.Count}");
+        }
+    }
+
+    /// <summary>
+    /// Clear all target point icons
+    /// </summary>
+    public void ClearTargetPointUI()
+    {
+        foreach (var icon in targetPointIcons)
+        {
+            if (icon != null)
+            {
+                Destroy(icon);
+            }
+        }
+        targetPointIcons.Clear();
+    }
+
     void ContinueOnClick()
+    {
+        // GameManager의 보상형 광고 로직 호출
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnContinueButtonPressed();
+        }
+    }
+
+    /// <summary>
+    /// Continue game UI cleanup (called by GameManager after ad)
+    /// </summary>
+    public void ContinueGameUI()
     {
         DOTween.KillAll();
 
@@ -155,9 +233,8 @@ public class UIManager : MonoBehaviour
         retryBtn.transform.localScale = Vector3.zero;
         exitBtn.transform.localScale = Vector3.zero;
         continueBtn.transform.localScale = Vector3.zero;
-
-        GameManager.Instance.RestartStage();
     }
+
     void NextOnClick()
     {
 

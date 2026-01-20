@@ -55,6 +55,12 @@ public class GameManager : MonoBehaviour
         InitializeStage();
         SpawnNewKnife();
         UpdateUI();
+
+        // Load and show banner ad when game starts (in-game only)
+        if (GoogleAdmobManager.Instance != null)
+        {
+            GoogleAdmobManager.Instance.LoadBannerAd();
+        }
     }
 
     public void SetGameActive(bool active) => isGameActive = active;
@@ -94,6 +100,12 @@ public class GameManager : MonoBehaviour
         {
             targetPointManager.SetTargetCharacter(targetCharacter);
             targetPointManager.InitializeTargetPoints(stageSettings.targetPointCount, occupiedAngles);
+
+            // Initialize target point UI
+            if (UIManager.Instance != null && stageSettings.targetPointCount > 0)
+            {
+                UIManager.Instance.InitializeTargetPointUI(stageSettings.targetPointCount);
+            }
         }
 
         UpdateStageText();
@@ -117,6 +129,11 @@ public class GameManager : MonoBehaviour
 
     public void OnTargetPointCompleted()
     {
+        // Remove one target point icon from UI
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.RemoveTargetPointIcon();
+        }
     }
 
     public List<StuckObj> GetAllKnives()
@@ -357,6 +374,12 @@ public class GameManager : MonoBehaviour
         {
             targetPointManager.ClearAllPoints();
         }
+
+        // Clear target point UI
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ClearTargetPointUI();
+        }
     }
 
     void ChapterComplete()
@@ -450,8 +473,68 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ContinueGame()
+    /// <summary>
+    /// Continue game after watching rewarded ad
+    /// Called from UIManager's ContinueOnClick
+    /// </summary>
+    public void OnContinueButtonPressed()
     {
+        if (GoogleAdmobManager.Instance != null)
+        {
+            // Check if rewarded ad is ready
+            if (GoogleAdmobManager.Instance.IsRewardedAdReady())
+            {
+                // Show rewarded ad
+                GoogleAdmobManager.Instance.ShowRewardedAd(
+                    onCompleted: () =>
+                    {
+                        // Ad watched successfully - continue game
+                        Debug.Log("Rewarded ad watched - continuing game");
+                        ContinueGameAfterAd();
+                    },
+                    onFailed: () =>
+                    {
+                        // Ad failed or user closed early
+                        Debug.Log("Rewarded ad failed or closed early");
+                        // Optionally show a message to the user
+                        if (UIManager.Instance != null)
+                        {
+                            Debug.Log("Please watch the ad to continue");
+                        }
+                    }
+                );
+            }
+            else
+            {
+                // Ad not ready - optionally allow continue anyway or show message
+                Debug.LogWarning("Rewarded ad not ready yet");
+
+                // Option 1: Allow continue anyway (generous to player)
+                ContinueGameAfterAd();
+
+                // Option 2: Show message and don't allow continue (uncomment if preferred)
+                // if (UIManager.Instance != null)
+                // {
+                //     Debug.Log("Ad not ready, please try again");
+                // }
+            }
+        }
+        else
+        {
+            // AdMob Manager not available - allow continue anyway
+            Debug.LogWarning("GoogleAdmobManager not found - continuing without ad");
+            ContinueGameAfterAd();
+        }
+    }
+
+    private void ContinueGameAfterAd()
+    {
+        // UI 정리
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ContinueGameUI();
+        }
+
         ClearAllKnives();
 
         isGameOver = false;
