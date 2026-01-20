@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0432eee6c92b24f4680e990322b4ac3e, type: 3}
+  m_Name: Chapter02
+  m_EditorClassIdentifier: Assembly-CSharp::ChapterData
+  chapterName: "\uD558\uB298"
+  chapterNumber: 1
+  chapterImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+  chapterBgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+  stages:
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 5a8d5451865f89444a0df81198051c4b, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 7
+    obstacleCount: 0
+    targetPointCount: 0
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 5a8d5451865f89444a0df81198051c4b, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 7
+    obstacleCount: 2
+    targetPointCount: 0
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 5a8d5451865f89444a0df81198051c4b, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 8
+    obstacleCount: 3
+    targetPointCount: 1
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 5a8d5451865f89444a0df81198051c4b, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+    obstacleCount: 4
+    targetPointCount: 2
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 8854f6768adcc9e4f81096195c715c31, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 5a8d5451865f89444a0df81198051c4b, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 6
+    obstacleCount: 6
+    targetPointCount: 3
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 3c24fd4f59024c741bb2b003a60ec2d9, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 11f123cee0e92b2409cf074e0c849dda, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 8
+    obstacleCount: 0
+    targetPointCount: 0
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 3c24fd4f59024c741bb2b003a60ec2d9, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 11f123cee0e92b2409cf074e0c849dda, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 5
+    obstacleCount: 5
+    targetPointCount: 0
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 3c24fd4f59024c741bb2b003a60ec2d9, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 11f123cee0e92b2409cf074e0c849dda, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 5
+    obstacleCount: 6
+    targetPointCount: 1
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 3c24fd4f59024c741bb2b003a60ec2d9, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 11f123cee0e92b2409cf074e0c849dda, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 10
+    obstacleCount: 2
+    targetPointCount: 2
+  - bgImage: {fileID: 21300000, guid: 7fc3525a2e534ae40a7102162da04ad1, type: 3}
+    targetImage: {fileID: 21300000, guid: 3c24fd4f59024c741bb2b003a60ec2d9, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: 11f123cee0e92b2409cf074e0c849dda, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 6
+    obstacleCount: 6
+    targetPointCount: 3

@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] float gameOverDelay = 0.5f;
 
     [Header("Chapter & Stage")]
-    [SerializeField] ChapterData currentChapter;
+    ChapterData currentChapter;
     [SerializeField] int currentStageIndex = 0;
 
     [Header("Target Points")]
@@ -59,6 +59,11 @@ public class GameManager : MonoBehaviour
         spawnWait = new WaitForSeconds(spawnDelay);
         transitionWait = new WaitForSeconds(stageTransitionDelay);
         gameOverWait = new WaitForSeconds(gameOverDelay);
+
+        if (LobbyManager.SelectedChapter != null)
+        {
+            currentChapter = LobbyManager.SelectedChapter;
+        }
     }
 
     void Start()
