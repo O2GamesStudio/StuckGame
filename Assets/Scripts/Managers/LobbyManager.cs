@@ -92,6 +92,9 @@ public class LobbyManager : MonoBehaviour
 
     void OnDestroy()
     {
-        chapterImage.transform.DOKill();
+        if (chapterImage != null)
+        {
+            chapterImage.transform.DOKill();
+        }
     }
 }

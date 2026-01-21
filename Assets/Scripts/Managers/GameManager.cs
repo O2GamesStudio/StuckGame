@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Lean.Pool;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -77,6 +78,34 @@ public class GameManager : MonoBehaviour
         {
             GoogleAdmobManager.Instance.LoadBannerAd();
         }
+    }
+
+    void Update()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            SkipToNextStage();
+        }
+    }
+
+    void SkipToNextStage()
+    {
+        if (isGameOver || !isGameActive) return;
+
+        StopAllCoroutines();
+
+        if (currentKnife != null)
+        {
+            LeanPool.Despawn(currentKnife);
+            currentKnife = null;
+        }
+
+        if (targetCharacter != null)
+        {
+            targetCharacter.StopRotationOnly();
+        }
+
+        StartCoroutine(TransitionToNextStage());
     }
 
     public void SetGameActive(bool active) => isGameActive = active;
@@ -222,24 +251,6 @@ public class GameManager : MonoBehaviour
         return angle;
     }
 
-    List<float> GetTargetPointAngles()
-    {
-        List<float> angles = new List<float>();
-        if (targetCharacter == null) return angles;
-
-        TargetPoint[] targetPoints = targetCharacter.GetComponentsInChildren<TargetPoint>();
-
-        foreach (TargetPoint point in targetPoints)
-        {
-            Vector3 localPos = point.transform.localPosition;
-            float angle = Mathf.Atan2(localPos.y, localPos.x) * Mathf.Rad2Deg - 90f;
-            if (angle < 0) angle += 360f;
-            angles.Add(angle);
-        }
-
-        return angles;
-    }
-
     void UpdateStageText()
     {
         if (UIManager.Instance != null)
@@ -301,7 +312,7 @@ public class GameManager : MonoBehaviour
 
         if (targetCharacter != null)
         {
-            targetCharacter.StopRotation();
+            targetCharacter.StopRotationOnly();
         }
 
         StartCoroutine(TransitionToNextStage());
@@ -309,8 +320,6 @@ public class GameManager : MonoBehaviour
 
     IEnumerator TransitionToNextStage()
     {
-        yield return transitionWait;
-
         currentStageIndex++;
 
         if (currentStageIndex >= currentChapter.TotalStages)
@@ -318,6 +327,13 @@ public class GameManager : MonoBehaviour
             ChapterComplete();
             yield break;
         }
+
+        if (targetCharacter != null)
+        {
+            targetCharacter.TransitionToNextStage();
+        }
+
+        yield return new WaitForSeconds(0.15f);
 
         LoadNextStage();
     }
@@ -373,7 +389,7 @@ public class GameManager : MonoBehaviour
 
         if (targetCharacter != null)
         {
-            targetCharacter.ClearStage();
+            targetCharacter.StopRotation();
         }
 
         FocusOnCharacterWin();
@@ -507,6 +523,11 @@ public class GameManager : MonoBehaviour
         {
             targetPointManager.SetTargetCharacter(targetCharacter);
             targetPointManager.InitializeTargetPoints(stageSettings.targetPointCount, occupiedAngles);
+
+            if (UIManager.Instance != null && stageSettings.targetPointCount > 0)
+            {
+                UIManager.Instance.InitializeTargetPointUI(stageSettings.targetPointCount);
+            }
         }
 
         SpawnNewKnife();

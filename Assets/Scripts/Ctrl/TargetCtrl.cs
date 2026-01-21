@@ -3,8 +3,6 @@ using DG.Tweening;
 
 public class TargetCtrl : MonoBehaviour
 {
-    Animator animator;
-
     [Header("Explosion Settings")]
     [SerializeField] float explosionForce = 15f;
     [SerializeField] float scaleMultiplier = 1.5f;
@@ -30,9 +28,6 @@ public class TargetCtrl : MonoBehaviour
     private float maxStartSpeed;
     private float minMaxSpeed;
     private float maxMaxSpeed;
-    private float minSpeedChangeRate;
-    private float maxSpeedChangeRate;
-    private float accelerationRatio;
     private float currentSpeedChangeRate;
     private bool rotateClockwise;
 
@@ -58,7 +53,6 @@ public class TargetCtrl : MonoBehaviour
 
     void Awake()
     {
-        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -216,28 +210,44 @@ public class TargetCtrl : MonoBehaviour
             .OnComplete(() => transform.DOMoveY(targetY, halfDuration).SetEase(Ease.InQuad));
     }
 
-    public void ClearStage()
+    public void TransitionToNextStage()
     {
-        StopRotation();
-
-        StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
-        for (int i = 0; i < stuckKnives.Length; i++)
+        isRotating = false;
+        if (rb != null)
         {
-            if (stuckKnives[i] != null)
-            {
-                stuckKnives[i].transform.SetParent(null);
-
-                Rigidbody2D knifeRb = stuckKnives[i].GetComponent<Rigidbody2D>();
-                if (knifeRb != null)
-                {
-                    knifeRb.bodyType = RigidbodyType2D.Kinematic;
-                    knifeRb.linearVelocity = zeroVelocity;
-                    knifeRb.angularVelocity = 0f;
-                }
-            }
+            rb.angularVelocity = 0f;
         }
 
-        animator.SetTrigger("Win");
+        transform.DOKill();
+        spriteRenderer.DOKill();
+
+        const float shrinkDuration = 0.15f;
+        const float expandDuration = 0.2f;
+
+        StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
+
+        transform.DOScale(Vector3.zero, shrinkDuration)
+            .SetEase(Ease.InBack)
+            .OnComplete(() =>
+            {
+                for (int i = 0; i < stuckKnives.Length; i++)
+                {
+                    if (stuckKnives[i] != null)
+                    {
+                        stuckKnives[i].transform.SetParent(null);
+
+                        Rigidbody2D knifeRb = stuckKnives[i].GetComponent<Rigidbody2D>();
+                        if (knifeRb != null)
+                        {
+                            knifeRb.bodyType = RigidbodyType2D.Kinematic;
+                            knifeRb.linearVelocity = zeroVelocity;
+                            knifeRb.angularVelocity = 0f;
+                        }
+                    }
+                }
+
+                transform.DOScale(originalScale, expandDuration).SetEase(Ease.OutBack);
+            });
     }
 
     public void StopRotation()

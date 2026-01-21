@@ -223,7 +223,7 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 6
+    requiredKnives: 5
     obstacleCount: 2
     targetPointCount: 0
   - bgImage: {fileID: 21300000, guid: cfd65a04c0f631f4198148c691e83c36, type: 3}
