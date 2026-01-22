@@ -54,8 +54,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        Application.targetFrameRate = 60;
         mainCam = Camera.main;
         spawnWait = new WaitForSeconds(spawnDelay);
         transitionWait = new WaitForSeconds(stageTransitionDelay);

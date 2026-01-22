@@ -43,26 +43,24 @@ public class SoundManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    void Start()
+    {
+        Application.targetFrameRate = 60;
+    }
 
     void InitializeSoundManager()
     {
-        // AudioSource 풀 생성
         for (int i = 0; i < initialPoolSize; i++)
         {
             CreateNewAudioSource();
         }
-
-        // BGM 전용 AudioSource 생성
         bgmSource = gameObject.AddComponent<AudioSource>();
         bgmSource.loop = true;
         bgmSource.volume = 1f;
         bgmSource.playOnAwake = false;
 
-        // PlayerPrefs에서 사운드 설정 로드
         isSoundEnabled = PlayerPrefs.GetInt("IsSoundOn", 1) == 1;
         isMusicEnabled = PlayerPrefs.GetInt("IsMusicOn", 1) == 1;
-
-        Debug.Log($"SoundManager 초기화 완료 - SFX Pool: {audioSourcePool.Count}");
     }
 
     AudioSource CreateNewAudioSource()
@@ -80,7 +78,6 @@ public class SoundManager : MonoBehaviour
     {
         AudioSource audioSource;
 
-        // 풀에서 사용 가능한 AudioSource 찾기
         while (audioSourcePool.Count > 0)
         {
             audioSource = audioSourcePool.Dequeue();
@@ -91,18 +88,14 @@ public class SoundManager : MonoBehaviour
             }
         }
 
-        // 풀이 비었고 최대 크기에 도달하지 않았다면 새로 생성
         if (activeAudioSources.Count < maxPoolSize)
         {
             audioSource = CreateNewAudioSource();
             audioSourcePool.Dequeue(); // 방금 추가된 것을 빼냄
             activeAudioSources.Add(audioSource);
-            Debug.Log($"새로운 AudioSource 생성 - 현재 활성: {activeAudioSources.Count}");
             return audioSource;
         }
 
-        // 최대 크기 도달 시 가장 오래된 소스 재사용
-        Debug.LogWarning("AudioSource 풀 최대 크기 도달 - 가장 오래된 소스 재사용");
         audioSource = activeAudioSources[0];
         audioSource.Stop();
         return audioSource;
@@ -121,8 +114,6 @@ public class SoundManager : MonoBehaviour
             audioSourcePool.Enqueue(audioSource);
         }
     }
-
-    // ==================== Sound On/Off ====================
 
     public void SetSoundEnabled(bool enabled)
     {
