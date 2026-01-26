@@ -29,8 +29,10 @@ public class StuckObj : MonoBehaviour, IPoolable
     private bool isFalling = false;
     private float cachedKnifeLength = -1f;
     private bool hasTriggeredGameOver = false;
+    private bool isDespawning = false;
     private WaitForSeconds despawnWait;
     private static readonly Vector2 zeroVelocity = Vector2.zero;
+    private Coroutine despawnCoroutine;
 
     void Awake()
     {
@@ -59,6 +61,12 @@ public class StuckObj : MonoBehaviour, IPoolable
 
     void IPoolable.OnDespawn()
     {
+        if (despawnCoroutine != null)
+        {
+            StopCoroutine(despawnCoroutine);
+            despawnCoroutine = null;
+        }
+
         StopAllCoroutines();
 
         if (GameManager.Instance != null && col != null)
@@ -80,6 +88,7 @@ public class StuckObj : MonoBehaviour, IPoolable
         }
 
         transform.SetParent(null);
+        isDespawning = false;
     }
 
     public void ResetForSpawn()
@@ -94,6 +103,13 @@ public class StuckObj : MonoBehaviour, IPoolable
         isStuckToTarget = false;
         isFalling = false;
         hasTriggeredGameOver = false;
+        isDespawning = false;
+
+        if (despawnCoroutine != null)
+        {
+            StopCoroutine(despawnCoroutine);
+            despawnCoroutine = null;
+        }
 
         if (rb != null)
         {
@@ -190,7 +206,7 @@ public class StuckObj : MonoBehaviour, IPoolable
             return;
         }
 
-        if (isStuck || isFalling || hasTriggeredGameOver) return;
+        if (isStuck || isFalling || hasTriggeredGameOver || isDespawning) return;
 
         if (co.transform.CompareTag("Target"))
         {
@@ -224,13 +240,24 @@ public class StuckObj : MonoBehaviour, IPoolable
         rb.angularVelocity = fallRotationSpeed * (Random.value > 0.5f ? 1f : -1f);
         rb.linearVelocity = zeroVelocity;
 
-        StartCoroutine(DespawnAfterDelay());
+        if (despawnCoroutine != null)
+        {
+            StopCoroutine(despawnCoroutine);
+        }
+        despawnCoroutine = StartCoroutine(DespawnAfterDelay());
     }
 
     IEnumerator DespawnAfterDelay()
     {
         yield return despawnWait;
-        LeanPool.Despawn(gameObject);
+
+        if (!isDespawning && gameObject != null && gameObject.activeInHierarchy)
+        {
+            isDespawning = true;
+            LeanPool.Despawn(gameObject);
+        }
+
+        despawnCoroutine = null;
     }
 
     void IgnoreStuckObjCollisions()

@@ -1,3 +1,4 @@
+// GameManager.cs
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,9 +21,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] float stageTransitionDelay = 1f;
     [SerializeField] float gameOverDelay = 0.5f;
 
-    [Header("Chapter & Stage")]
-    ChapterData currentChapter;
-    [SerializeField] int currentStageIndex = 0;
+    [Header("Stage")]
+    private ChapterData[] allChapters;
+    private int currentGlobalStageIndex = 0;
+    private int totalStages = 0;
 
     [Header("Target Points")]
     [SerializeField] TargetPointManager targetPointManager;
@@ -63,9 +65,13 @@ public class GameManager : MonoBehaviour
         transitionWait = new WaitForSeconds(stageTransitionDelay);
         gameOverWait = new WaitForSeconds(gameOverDelay);
 
-        if (LobbyManager.SelectedGameMode == LobbyManager.GameMode.Chapter && LobbyManager.SelectedChapter != null)
+        allChapters = LobbyManager.AllChapters;
+        if (allChapters != null)
         {
-            currentChapter = LobbyManager.SelectedChapter;
+            foreach (var chapter in allChapters)
+            {
+                totalStages += chapter.TotalStages;
+            }
         }
     }
 
@@ -79,6 +85,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            currentGlobalStageIndex = 0;
             InitializeStage();
             UpdateStageText();
         }
@@ -99,6 +106,7 @@ public class GameManager : MonoBehaviour
             SkipToNextStage();
         }
     }
+
     void InitializeInfiniteMode()
     {
         infiniteKnifeCount = 0;
@@ -143,7 +151,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     void SkipToNextStage()
     {
         if (isGameOver || !isGameActive) return;
@@ -166,11 +173,26 @@ public class GameManager : MonoBehaviour
 
     public void SetGameActive(bool active) => isGameActive = active;
 
+    ChapterData.StageSettings GetCurrentStageSettings()
+    {
+        int stageCounter = 0;
+        foreach (var chapter in allChapters)
+        {
+            if (currentGlobalStageIndex < stageCounter + chapter.TotalStages)
+            {
+                int localStageIndex = currentGlobalStageIndex - stageCounter;
+                return chapter.GetStageSettings(localStageIndex);
+            }
+            stageCounter += chapter.TotalStages;
+        }
+        return allChapters[0].GetStageSettings(0);
+    }
+
     void InitializeStage()
     {
-        if (currentChapter == null) return;
+        if (allChapters == null || allChapters.Length == 0) return;
 
-        ChapterData.StageSettings stageSettings = currentChapter.GetStageSettings(currentStageIndex);
+        ChapterData.StageSettings stageSettings = GetCurrentStageSettings();
         targetStuckVal = stageSettings.requiredKnives;
         currentStuckObjPrefab = stageSettings.stuckObjPrefab;
 
@@ -309,9 +331,9 @@ public class GameManager : MonoBehaviour
 
     void UpdateStageText()
     {
-        if (LobbyManager.SelectedGameMode == LobbyManager.GameMode.Chapter && UIManager.Instance != null)
+        if (LobbyManager.SelectedGameMode == LobbyManager.GameMode.Story && UIManager.Instance != null)
         {
-            UIManager.Instance.UpdateStageText(currentStageIndex + 1);
+            UIManager.Instance.UpdateStageText(currentGlobalStageIndex + 1);
         }
     }
 
@@ -387,11 +409,11 @@ public class GameManager : MonoBehaviour
 
     IEnumerator TransitionToNextStage()
     {
-        currentStageIndex++;
+        currentGlobalStageIndex++;
 
-        if (currentStageIndex >= currentChapter.TotalStages)
+        if (currentGlobalStageIndex >= totalStages)
         {
-            ChapterComplete();
+            AllStagesComplete();
             yield break;
         }
 
@@ -416,28 +438,40 @@ public class GameManager : MonoBehaviour
 
     void ClearAllKnives()
     {
-        for (int i = allKnives.Count - 1; i >= 0; i--)
-        {
-            if (allKnives[i] != null)
-            {
-                allKnives[i].transform.SetParent(null);
-                LeanPool.Despawn(allKnives[i]);
-            }
-        }
-        allKnives.Clear();
+        StopAllCoroutines();
 
         if (targetCharacter != null)
         {
-            StuckObj[] remainingKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
-            for (int i = 0; i < remainingKnives.Length; i++)
+            StuckObj[] childKnives = targetCharacter.GetComponentsInChildren<StuckObj>();
+            for (int i = 0; i < childKnives.Length; i++)
             {
-                if (remainingKnives[i] != null)
+                if (childKnives[i] != null && childKnives[i].gameObject != null)
                 {
-                    remainingKnives[i].transform.SetParent(null);
-                    LeanPool.Despawn(remainingKnives[i]);
+                    childKnives[i].transform.SetParent(null);
+                    childKnives[i].StopAllCoroutines();
+
+                    if (childKnives[i].gameObject.activeInHierarchy)
+                    {
+                        LeanPool.Despawn(childKnives[i]);
+                    }
                 }
             }
         }
+
+        for (int i = allKnives.Count - 1; i >= 0; i--)
+        {
+            if (allKnives[i] != null && allKnives[i].gameObject != null)
+            {
+                allKnives[i].transform.SetParent(null);
+                allKnives[i].StopAllCoroutines();
+
+                if (allKnives[i].gameObject.activeInHierarchy)
+                {
+                    LeanPool.Despawn(allKnives[i]);
+                }
+            }
+        }
+        allKnives.Clear();
 
         if (targetPointManager != null)
         {
@@ -450,7 +484,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void ChapterComplete()
+    void AllStagesComplete()
     {
         isGameOver = true;
 
@@ -486,16 +520,14 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(FocusAfterExplosion());
     }
+
     void SaveHighestStage()
     {
-        if (currentChapter == null) return;
+        int savedStage = PlayerPrefs.GetInt("HighestStage", 1);
 
-        int chapterIndex = LobbyManager.LastPlayedChapterIndex;
-        int savedStage = PlayerPrefs.GetInt($"Chapter_{chapterIndex}_HighestStage", 0);
-
-        if (currentStageIndex + 1 > savedStage)
+        if (currentGlobalStageIndex + 1 > savedStage)
         {
-            PlayerPrefs.SetInt($"Chapter_{chapterIndex}_HighestStage", currentStageIndex + 1);
+            PlayerPrefs.SetInt("HighestStage", currentGlobalStageIndex + 1);
             PlayerPrefs.Save();
         }
     }
@@ -586,9 +618,7 @@ public class GameManager : MonoBehaviour
         isGameActive = true;
         stuckAmount = 0;
 
-        if (currentChapter == null) return;
-
-        ChapterData.StageSettings stageSettings = currentChapter.GetStageSettings(currentStageIndex);
+        ChapterData.StageSettings stageSettings = GetCurrentStageSettings();
         currentStuckObjPrefab = stageSettings.stuckObjPrefab;
 
         if (currentStuckObjPrefab == null) return;
@@ -629,7 +659,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartChapter()
     {
-        currentStageIndex = 0;
+        currentGlobalStageIndex = 0;
         RestartStage();
     }
 }

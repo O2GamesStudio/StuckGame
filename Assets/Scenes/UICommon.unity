@@ -410,6 +410,7 @@ MonoBehaviour:
   - {fileID: 807859231}
   - {fileID: 341273248}
   infiniteModeObjects:
+  - {fileID: 354356985}
   - {fileID: 552576931}
   circleMask: {fileID: 1712742266}
 --- !u!1 &465632972
@@ -745,7 +746,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &552576932
 RectTransform:
   m_ObjectHideFlags: 0

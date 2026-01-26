@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Lean.Pool;
 
 public class TargetPointManager : MonoBehaviour
 {
@@ -56,7 +57,7 @@ public class TargetPointManager : MonoBehaviour
             occupiedAngles.Add(angle);
             occupiedCount++;
 
-            GameObject pointObj = Instantiate(targetPointPrefab, targetCharacter.transform);
+            GameObject pointObj = LeanPool.Spawn(targetPointPrefab, targetCharacter.transform);
             pointObj.name = $"TargetPoint_{i}";
 
             Quaternion rotation = Quaternion.Euler(0, 0, angle);
@@ -101,6 +102,7 @@ public class TargetPointManager : MonoBehaviour
     {
         if (!activePoints.Contains(point)) return;
 
+        activePoints.Remove(point);
         completedPointsCount++;
         GameManager.Instance?.OnTargetPointCompleted();
     }
@@ -115,9 +117,9 @@ public class TargetPointManager : MonoBehaviour
     {
         for (int i = activePoints.Count - 1; i >= 0; i--)
         {
-            if (activePoints[i] != null)
+            if (activePoints[i] != null && activePoints[i].gameObject != null)
             {
-                Destroy(activePoints[i].gameObject);
+                LeanPool.Despawn(activePoints[i].gameObject);
             }
         }
 

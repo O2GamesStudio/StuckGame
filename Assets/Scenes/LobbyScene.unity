@@ -2011,13 +2011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 427603bc2c172524e863242b4db4952e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyManager
-  chapterImage: {fileID: 1952679584}
-  bgImage: {fileID: 1395520953}
   startBtn: {fileID: 1677558899}
   infiniteModeBtn: {fileID: 93511814}
-  preBtn: {fileID: 154346720}
-  nextBtn: {fileID: 2078376235}
-  rotationDuration: 0.3
   highestStageText: {fileID: 1701024517}
   chapterDatas:
   - {fileID: 11400000, guid: 03304a5993c0057428c65c4cbc1293a9, type: 2}

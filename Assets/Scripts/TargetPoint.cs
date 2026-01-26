@@ -1,13 +1,15 @@
 using UnityEngine;
 using System.Collections;
+using Lean.Pool;
 
-public class TargetPoint : MonoBehaviour
+public class TargetPoint : MonoBehaviour, IPoolable
 {
     [Header("Rotation Settings")]
     [SerializeField] float minRotationSpeed = 30f;
     [SerializeField] float maxRotationSpeed = 120f;
 
     private bool isCompleted = false;
+    private bool isDespawning = false;
     private Collider2D pointCollider;
     private WaitForFixedUpdate waitFixed;
     private float rotationSpeed;
@@ -22,19 +24,28 @@ public class TargetPoint : MonoBehaviour
         }
         pointCollider.isTrigger = true;
         waitFixed = new WaitForFixedUpdate();
-
-        rotationSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
-        if (Random.value > 0.5f) rotationSpeed *= -1f;
     }
 
-    void Start()
+    void IPoolable.OnSpawn()
     {
+        isCompleted = false;
+        isDespawning = false;
+        rotationSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
+        if (Random.value > 0.5f) rotationSpeed *= -1f;
+
         StartCoroutine(CheckOverlapNextFrame());
+    }
+
+    void IPoolable.OnDespawn()
+    {
+        StopAllCoroutines();
+        isCompleted = false;
+        isDespawning = false;
     }
 
     void Update()
     {
-        if (!isCompleted)
+        if (!isCompleted && !isDespawning)
         {
             transform.Rotate(0f, 0f, rotationSpeed * Time.deltaTime);
         }
@@ -66,18 +77,19 @@ public class TargetPoint : MonoBehaviour
 
     void CompletePoint()
     {
-        if (isCompleted) return;
+        if (isCompleted || isDespawning) return;
 
         isCompleted = true;
+        isDespawning = true;
         TargetPointManager.Instance?.OnPointCompleted(this);
-        Destroy(gameObject);
+        LeanPool.Despawn(gameObject);
     }
 
     public bool IsCompleted => isCompleted;
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isCompleted || !collision.CompareTag("StuckObj")) return;
+        if (isCompleted || isDespawning || !collision.CompareTag("StuckObj")) return;
 
         StuckObj stuckObj = collision.GetComponent<StuckObj>();
         if (stuckObj != null)

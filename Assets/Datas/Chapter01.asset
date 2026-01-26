@@ -33,7 +33,7 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 7
+    requiredKnives: 6
     obstacleCount: 0
     targetPointCount: 0
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
@@ -52,8 +52,8 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 9
-    obstacleCount: 3
+    requiredKnives: 6
+    obstacleCount: 2
     targetPointCount: 0
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: 506410ddcb0a3bd46bb8eda8f05a349d, type: 3}
@@ -71,8 +71,8 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 9
-    obstacleCount: 5
+    requiredKnives: 7
+    obstacleCount: 3
     targetPointCount: 1
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: 506410ddcb0a3bd46bb8eda8f05a349d, type: 3}
@@ -90,8 +90,8 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 10
-    obstacleCount: 7
+    requiredKnives: 9
+    obstacleCount: 3
     targetPointCount: 2
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: 506410ddcb0a3bd46bb8eda8f05a349d, type: 3}
@@ -110,7 +110,7 @@ MonoBehaviour:
     reverseWaitTime: 0.3
     reverseDirection: 1
     requiredKnives: 15
-    obstacleCount: 5
+    obstacleCount: 0
     targetPointCount: 3
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
@@ -128,9 +128,28 @@ MonoBehaviour:
     reverseDeceleration: 100
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 6
+    requiredKnives: 5
     obstacleCount: 2
     targetPointCount: 0
+  - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
+    targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
+    stuckObjPrefab: {fileID: 446823913286080183, guid: ad373a1c8bce8d746917be3945423f69, type: 3}
+    minStartSpeed: 30
+    maxStartSpeed: 80
+    minSpeedChangeRate: 50
+    maxSpeedChangeRate: 100
+    minMaxSpeed: 80
+    maxMaxSpeed: 160
+    accelerationRatio: 0.4
+    rotateClockwise: 1
+    minHoldTime: 1
+    maxHoldTime: 3
+    reverseDeceleration: 100
+    reverseWaitTime: 0.3
+    reverseDirection: 1
+    requiredKnives: 6
+    obstacleCount: 3
+    targetPointCount: 1
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
     stuckObjPrefab: {fileID: 446823913286080183, guid: ad373a1c8bce8d746917be3945423f69, type: 3}
@@ -148,26 +167,7 @@ MonoBehaviour:
     reverseWaitTime: 0.3
     reverseDirection: 1
     requiredKnives: 8
-    obstacleCount: 4
-    targetPointCount: 1
-  - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
-    targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
-    stuckObjPrefab: {fileID: 446823913286080183, guid: ad373a1c8bce8d746917be3945423f69, type: 3}
-    minStartSpeed: 30
-    maxStartSpeed: 80
-    minSpeedChangeRate: 50
-    maxSpeedChangeRate: 100
-    minMaxSpeed: 80
-    maxMaxSpeed: 160
-    accelerationRatio: 0.4
-    rotateClockwise: 1
-    minHoldTime: 1
-    maxHoldTime: 3
-    reverseDeceleration: 100
-    reverseWaitTime: 0.3
-    reverseDirection: 1
-    requiredKnives: 10
-    obstacleCount: 4
+    obstacleCount: 3
     targetPointCount: 2
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
@@ -186,7 +186,7 @@ MonoBehaviour:
     reverseWaitTime: 0.3
     reverseDirection: 1
     requiredKnives: 10
-    obstacleCount: 5
+    obstacleCount: 3
     targetPointCount: 3
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: fcf520953fe112a47a72e2546d8a85e8, type: 3}
@@ -204,8 +204,8 @@ MonoBehaviour:
     reverseDeceleration: 150
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 15
-    obstacleCount: 2
+    requiredKnives: 8
+    obstacleCount: 6
     targetPointCount: 3
   - bgImage: {fileID: 21300000, guid: 290ee2c4ea7ac34449892e07bcb33ac1, type: 3}
     targetImage: {fileID: 21300000, guid: 56053277c64683941b6e852d05ac150e, type: 3}
@@ -299,6 +299,6 @@ MonoBehaviour:
     reverseDeceleration: 150
     reverseWaitTime: 0.3
     reverseDirection: 1
-    requiredKnives: 9
+    requiredKnives: 8
     obstacleCount: 1
     targetPointCount: 3
