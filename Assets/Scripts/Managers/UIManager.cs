@@ -265,9 +265,19 @@ public class UIManager : MonoBehaviour
         GameObject iconToRemove = targetPointIcons[0];
         targetPointIcons.RemoveAt(0);
 
-        iconToRemove.transform.DOScale(0f, 0.3f)
-            .SetEase(Ease.InBack)
-            .OnComplete(() => Destroy(iconToRemove));
+        if (iconToRemove != null)
+        {
+            iconToRemove.transform.DOKill();
+            iconToRemove.transform.DOScale(0f, 0.3f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() =>
+                {
+                    if (iconToRemove != null)
+                    {
+                        Destroy(iconToRemove);
+                    }
+                });
+        }
     }
 
     public void ClearTargetPointUI()
@@ -276,6 +286,7 @@ public class UIManager : MonoBehaviour
         {
             if (targetPointIcons[i] != null)
             {
+                targetPointIcons[i].transform.DOKill();
                 Destroy(targetPointIcons[i]);
             }
         }

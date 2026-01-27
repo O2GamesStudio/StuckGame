@@ -295,7 +295,10 @@ public class StuckObj : MonoBehaviour, IPoolable
             ? targetCollider.radius * collision.transform.localScale.x
             : 1f;
 
-        transform.position = (Vector2)collision.transform.position + centerToObj * (targetRadius + targetStickOffset);
+        float scaleFactor = GameManager.Instance != null ? GameManager.Instance.GetScaleFactor() : 1f;
+        float scaledStickOffset = targetStickOffset * scaleFactor;
+
+        transform.position = (Vector2)collision.transform.position + centerToObj * (targetRadius + scaledStickOffset);
 
         rb.linearVelocity = zeroVelocity;
         rb.angularVelocity = 0f;

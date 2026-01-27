@@ -1,3 +1,4 @@
+// TargetCtrl.cs
 using UnityEngine;
 using DG.Tweening;
 
@@ -84,7 +85,9 @@ public class TargetCtrl : MonoBehaviour
             col.enabled = true;
         }
 
-        transform.localScale = originalScale;
+        float scaleFactor = GameManager.Instance != null ? GameManager.Instance.GetScaleFactor() : 1f;
+        transform.localScale = originalScale * scaleFactor;
+
         isRotating = true;
 
         InitializeRotation();
@@ -226,6 +229,9 @@ public class TargetCtrl : MonoBehaviour
 
         StuckObj[] stuckKnives = GetComponentsInChildren<StuckObj>();
 
+        float scaleFactor = GameManager.Instance != null ? GameManager.Instance.GetScaleFactor() : 1f;
+        Vector3 targetScale = originalScale * scaleFactor;
+
         transform.DOScale(Vector3.zero, shrinkDuration)
             .SetEase(Ease.InBack)
             .OnComplete(() =>
@@ -246,7 +252,7 @@ public class TargetCtrl : MonoBehaviour
                     }
                 }
 
-                transform.DOScale(originalScale, expandDuration).SetEase(Ease.OutBack);
+                transform.DOScale(targetScale, expandDuration).SetEase(Ease.OutBack);
             });
     }
 
@@ -303,10 +309,13 @@ public class TargetCtrl : MonoBehaviour
             }
         }
 
-        transform.DOScale(originalScale * scaleMultiplier, scaleDuration)
+        float scaleFactor = GameManager.Instance != null ? GameManager.Instance.GetScaleFactor() : 1f;
+        Vector3 targetScale = originalScale * scaleFactor;
+
+        transform.DOScale(targetScale * scaleMultiplier, scaleDuration)
             .SetEase(Ease.OutBack)
             .OnStart(() => LaunchKnives(stuckKnives))
-            .OnComplete(() => transform.DOScale(originalScale, scaleDuration).SetEase(Ease.InBack));
+            .OnComplete(() => transform.DOScale(targetScale, scaleDuration).SetEase(Ease.InBack));
     }
 
     public void StopRotationOnly()

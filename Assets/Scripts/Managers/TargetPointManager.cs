@@ -1,3 +1,4 @@
+// TargetPointManager.cs
 using UnityEngine;
 using System.Collections.Generic;
 using Lean.Pool;
@@ -49,6 +50,9 @@ public class TargetPointManager : MonoBehaviour
             ? targetCollider.radius * targetCharacter.transform.localScale.x
             : 1f;
 
+        float scaleFactor = GameManager.Instance != null ? GameManager.Instance.GetScaleFactor() : 1f;
+        float scaledPointOffset = pointOffset / (scaleFactor * scaleFactor);
+
         int occupiedCount = occupiedAngles.Count;
 
         for (int i = 0; i < count; i++)
@@ -59,10 +63,11 @@ public class TargetPointManager : MonoBehaviour
 
             GameObject pointObj = LeanPool.Spawn(targetPointPrefab, targetCharacter.transform);
             pointObj.name = $"TargetPoint_{i}";
+            pointObj.transform.localScale = Vector3.one * scaleFactor;
 
             Quaternion rotation = Quaternion.Euler(0, 0, angle);
             Vector3 direction = rotation * Vector3.up;
-            pointObj.transform.localPosition = direction * (targetRadius + pointOffset);
+            pointObj.transform.localPosition = direction * (targetRadius + scaledPointOffset);
             pointObj.transform.localRotation = rotation;
 
             TargetPoint point = pointObj.GetComponent<TargetPoint>();

@@ -94,6 +94,7 @@ public class TargetPoint : MonoBehaviour, IPoolable
         StuckObj stuckObj = collision.GetComponent<StuckObj>();
         if (stuckObj != null)
         {
+            Debug.Log(collision.transform.name);
             CompletePoint();
         }
     }

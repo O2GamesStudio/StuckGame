@@ -36,6 +36,11 @@ public class GameManager : MonoBehaviour
     private int infiniteKnifeCount = 0;
     [SerializeField] ChapterData.StageSettings infiniteModeSettings;
 
+    [Header("Resolution Scaling")]
+    [SerializeField] float baseOrthographicSize = 10f;
+    [SerializeField] float baseAspectRatio = 0.5625f;
+    private float scaleFactor = 1f;
+
     private StuckObj currentKnife;
     private bool isGameOver = false;
     private bool isGameActive = false;
@@ -61,6 +66,9 @@ public class GameManager : MonoBehaviour
             return;
         }
         mainCam = Camera.main;
+        CalculateScaleFactor();
+        AdjustSpawnPointPosition();
+
         spawnWait = new WaitForSeconds(spawnDelay);
         transitionWait = new WaitForSeconds(stageTransitionDelay);
         gameOverWait = new WaitForSeconds(gameOverDelay);
@@ -74,6 +82,29 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    void CalculateScaleFactor()
+    {
+        if (mainCam != null)
+        {
+            float currentAspectRatio = (float)Screen.width / Screen.height;
+            scaleFactor = currentAspectRatio / baseAspectRatio;
+        }
+    }
+
+    void AdjustSpawnPointPosition()
+    {
+        if (spawnPoint == null || mainCam == null) return;
+
+        float screenTop = mainCam.orthographicSize;
+        float spawnYOffset = 2f;
+
+        Vector3 newPosition = spawnPoint.position;
+        newPosition.y = -screenTop + spawnYOffset;
+        spawnPoint.position = newPosition;
+    }
+
+    public float GetScaleFactor() => scaleFactor;
 
     void Start()
     {
@@ -277,7 +308,7 @@ public class GameManager : MonoBehaviour
             ? targetCollider.radius * targetCharacter.transform.localScale.x
             : 1f;
 
-        float stickOffset = currentStuckObjPrefab.GetTargetStickOffset();
+        float stickOffset = currentStuckObjPrefab.GetTargetStickOffset() * scaleFactor;
         const float minAngleGap = 30f;
         const int maxAttempts = 100;
 
@@ -291,6 +322,7 @@ public class GameManager : MonoBehaviour
             Vector3 spawnPosition = targetCharacter.transform.position + direction * (targetRadius + stickOffset);
 
             StuckObj obstacle = LeanPool.Spawn(currentStuckObjPrefab, spawnPosition, Quaternion.identity);
+            obstacle.transform.localScale = Vector3.one * scaleFactor;
             obstacle.transform.SetParent(targetCharacter.transform);
 
             Vector3 localDir = obstacle.transform.parent.InverseTransformDirection(direction);
@@ -342,7 +374,11 @@ public class GameManager : MonoBehaviour
         if (isGameOver || !isGameActive || currentStuckObjPrefab == null || spawnPoint == null) return;
 
         currentKnife = LeanPool.Spawn(currentStuckObjPrefab, spawnPoint.position, Quaternion.identity);
-        if (currentKnife != null) allKnives.Add(currentKnife);
+        if (currentKnife != null)
+        {
+            currentKnife.transform.localScale = Vector3.one * scaleFactor;
+            allKnives.Add(currentKnife);
+        }
     }
 
     public void OnClick()

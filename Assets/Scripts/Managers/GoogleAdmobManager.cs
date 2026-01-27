@@ -6,9 +6,8 @@ public class GoogleAdmobManager : MonoBehaviour
 {
     public static GoogleAdmobManager Instance { get; private set; }
 
-    [Header("Ad Unit IDs - Android")]
-    [SerializeField] private string androidBannerAdUnitId = "ca-app-pub-XXXXXXXXXXXXXXXX/BBBBBBBBBB"; // Real ID
-    [SerializeField] private string androidRewardedAdUnitId = "ca-app-pub-XXXXXXXXXXXXXXXX/RRRRRRRRRR"; // Real ID
+    private string androidBannerAdUnitId = "ca-app-pub-3490273194196393/8505313920"; // Real ID
+    private string androidRewardedAdUnitId = "ca-app-pub-3490273194196393/2518490075"; // Real ID
 
     // Test Ad Unit IDs (Google 제공 테스트 ID)
     private const string TEST_ANDROID_BANNER = "ca-app-pub-3940256099942544/6300978111";
