@@ -484,6 +484,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void PauseGame()
+    {
+        isGameActive = false;
+
+        if (targetCharacter != null)
+        {
+            targetCharacter.gameObject.SetActive(false);
+        }
+    }
+
+    public void ResumeGame()
+    {
+        if (targetCharacter != null)
+        {
+            targetCharacter.gameObject.SetActive(true);
+        }
+
+        isGameActive = true;
+    }
+
     void AllStagesComplete()
     {
         isGameOver = true;
@@ -523,12 +543,25 @@ public class GameManager : MonoBehaviour
 
     void SaveHighestStage()
     {
-        int savedStage = PlayerPrefs.GetInt("HighestStage", 1);
-
-        if (currentGlobalStageIndex + 1 > savedStage)
+        if (LobbyManager.SelectedGameMode == LobbyManager.GameMode.Infinite)
         {
-            PlayerPrefs.SetInt("HighestStage", currentGlobalStageIndex + 1);
-            PlayerPrefs.Save();
+            int savedInfinite = PlayerPrefs.GetInt("HighestInfinite", 0);
+
+            if (infiniteKnifeCount > savedInfinite)
+            {
+                PlayerPrefs.SetInt("HighestInfinite", infiniteKnifeCount);
+                PlayerPrefs.Save();
+            }
+        }
+        else
+        {
+            int savedStage = PlayerPrefs.GetInt("HighestStage", 1);
+
+            if (currentGlobalStageIndex + 1 > savedStage)
+            {
+                PlayerPrefs.SetInt("HighestStage", currentGlobalStageIndex + 1);
+                PlayerPrefs.Save();
+            }
         }
     }
 

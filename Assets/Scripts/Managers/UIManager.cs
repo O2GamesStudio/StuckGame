@@ -84,7 +84,10 @@ public class UIManager : MonoBehaviour
         retryBtn.transform.localScale = zeroScale;
         exitBtn.transform.localScale = zeroScale;
         continueBtn.transform.localScale = zeroScale;
+        nextBtn.transform.localScale = zeroScale;
+        exitWinBtn.transform.localScale = zeroScale;
     }
+
 
     public void SetInfiniteMode(bool infinite)
     {
@@ -107,6 +110,10 @@ public class UIManager : MonoBehaviour
     }
     void SettingOnClick()
     {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseGame();
+        }
         settingPanel.gameObject.SetActive(true);
     }
     void SetModeObjects(bool infinite)
@@ -158,13 +165,26 @@ public class UIManager : MonoBehaviour
 
     public void ShowWinUI()
     {
-        nextBtn.transform.DOLocalMove(nextBtnTargetPos, buttonMoveDuration)
-            .SetEase(buttonMoveEase)
-            .OnComplete(() => StartButtonBounce(nextBtn, nextBtnTargetPos));
+        nextBtn.transform.localScale = zeroScale;
+        exitWinBtn.transform.localScale = zeroScale;
 
-        exitWinBtn.transform.DOLocalMove(exitWinBtnTargetPos, buttonMoveDuration)
-            .SetEase(buttonMoveEase)
-            .OnComplete(() => StartButtonBounce(exitWinBtn, exitWinBtnTargetPos));
+        nextBtn.transform.DOScale(1f, buttonMoveDuration)
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                nextBtn.transform.DOLocalMove(nextBtnTargetPos, buttonMoveDuration)
+                    .SetEase(buttonMoveEase)
+                    .OnComplete(() => StartButtonBounce(nextBtn, nextBtnTargetPos));
+            });
+
+        exitWinBtn.transform.DOScale(1f, buttonMoveDuration)
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                exitWinBtn.transform.DOLocalMove(exitWinBtnTargetPos, buttonMoveDuration)
+                    .SetEase(buttonMoveEase)
+                    .OnComplete(() => StartButtonBounce(exitWinBtn, exitWinBtnTargetPos));
+            });
     }
 
     public void ShowLoseUI()

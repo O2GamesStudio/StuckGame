@@ -4940,6 +4940,9 @@ MonoBehaviour:
   musicToggleImage: {fileID: 420269633}
   soundHandleImage: {fileID: 1085238914}
   musicHandleImage: {fileID: 1757591819}
+  toggleImages:
+  - {fileID: 21300000, guid: 575a1a52ed71bde4fb32451171f1f9bb, type: 3}
+  - {fileID: 21300000, guid: 326c740ea7e47af4ca8ebc7c97df3773, type: 3}
   isSoundOn: 1
   isMusicOn: 1
 --- !u!1 &1972582195

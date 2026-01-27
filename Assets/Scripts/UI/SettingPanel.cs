@@ -1,6 +1,4 @@
-using System.Security;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -8,10 +6,10 @@ using DG.Tweening;
 public class SettingPanel : MonoBehaviour
 {
     [SerializeField] Button toLobbyBtn, resumeBtn;
-
     [SerializeField] Button soundBtn, musicBtn;
     [SerializeField] Image soundToggleImage, musicToggleImage;
     [SerializeField] Image soundHandleImage, musicHandleImage;
+    [SerializeField] Sprite[] toggleImages;
 
     [SerializeField] bool isSoundOn = true;
     [SerializeField] bool isMusicOn = true;
@@ -22,7 +20,6 @@ public class SettingPanel : MonoBehaviour
             resumeBtn.onClick.AddListener(ResumeOnClick);
         if (toLobbyBtn != null)
             toLobbyBtn.onClick.AddListener(ToLobbyOnClick);
-
         if (soundBtn != null)
             soundBtn.onClick.AddListener(SoundOnClick);
         if (musicBtn != null)
@@ -45,9 +42,9 @@ public class SettingPanel : MonoBehaviour
 
     void UpdateSoundUI()
     {
-        if (soundToggleImage != null)
+        if (soundToggleImage != null && toggleImages != null && toggleImages.Length >= 2)
         {
-            soundToggleImage.gameObject.SetActive(isSoundOn);
+            soundToggleImage.sprite = isSoundOn ? toggleImages[0] : toggleImages[1];
         }
 
         if (soundHandleImage != null)
@@ -62,9 +59,9 @@ public class SettingPanel : MonoBehaviour
 
     void UpdateMusicUI()
     {
-        if (musicToggleImage != null)
+        if (musicToggleImage != null && toggleImages != null && toggleImages.Length >= 2)
         {
-            musicToggleImage.gameObject.SetActive(isMusicOn);
+            musicToggleImage.sprite = isMusicOn ? toggleImages[0] : toggleImages[1];
         }
 
         if (musicHandleImage != null)
@@ -115,11 +112,18 @@ public class SettingPanel : MonoBehaviour
             SoundManager.Instance.PlayUIClickSFX();
         }
     }
+
     void ResumeOnClick()
     {
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlayUIClickSFX();
-        this.gameObject.SetActive(false);
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResumeGame();
+        }
+
+        gameObject.SetActive(false);
     }
 
     void ToLobbyOnClick()
